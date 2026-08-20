@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Portal | Login</title>
+  <!-- Google Fonts & FontAwesome Icons -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', sans-serif;
+    }
+
+    body {
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .login-card {
+      background: rgba(30, 41, 59, 0.7);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 16px;
+      padding: 40px 32px;
+      width: 100%;
+      max-width: 420px;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.5);
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+
+    .header .admin-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 52px;
+      height: 52px;
+      background: rgba(59, 130, 246, 0.15);
+      border: 1px solid rgba(59, 130, 246, 0.3);
+      color: #60a5fa;
+      border-radius: 12px;
+      font-size: 22px;
+      margin-bottom: 16px;
+    }
+
+    .header h2 {
+      color: #f8fafc;
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .header p {
+      color: #94a3b8;
+      font-size: 14px;
+    }
+
+    .error-alert {
+      background: rgba(239, 68, 68, 0.15);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      color: #fca5a5;
+      padding: 12px 16px;
+      border-radius: 8px;
+      font-size: 13px;
+      margin-bottom: 20px;
+      display: none;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-group label {
+      display: block;
+      color: #cbd5e1;
+      font-size: 13px;
+      font-weight: 500;
+      margin-bottom: 8px;
+    }
+
+    .input-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .input-wrapper i.left-icon {
+      position: absolute;
+      left: 14px;
+      color: #64748b;
+      font-size: 15px;
+    }
+
+    .input-wrapper input {
+      width: 100%;
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid #334155;
+      border-radius: 10px;
+      padding: 12px 16px 12px 42px;
+      color: #f8fafc;
+      font-size: 14px;
+      outline: none;
+      transition: all 0.2s ease;
+    }
+
+    .input-wrapper input:focus {
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+    }
+
+    .input-wrapper .toggle-password {
+      position: absolute;
+      right: 14px;
+      color: #64748b;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    .input-wrapper .toggle-password:hover {
+      color: #cbd5e1;
+    }
+
+    .submit-btn {
+      width: 100%;
+      background: #2563eb;
+      color: #ffffff;
+      border: none;
+      border-radius: 10px;
+      padding: 12px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s ease, transform 0.1s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .submit-btn:hover {
+      background: #1d4ed8;
+    }
+
+    .submit-btn:active {
+      transform: scale(0.99);
+    }
+
+    .divider {
+      display: flex;
+      align-items: center;
+      margin: 24px 0;
+    }
+
+    .divider::before, .divider::after {
+      content: '';
+      flex: 1;
+      border-bottom: 1px solid #334155;
+    }
+
+    .divider span {
+      padding: 0 12px;
+      color: #64748b;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .google-btn {
+      width: 100%;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid #334155;
+      border-radius: 10px;
+      padding: 12px;
+      color: #f8fafc;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      transition: background 0.2s ease, border-color 0.2s ease;
+    }
+
+    .google-btn:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: #475569;
+    }
+
+    .google-btn svg {
+      width: 18px;
+      height: 18px;
+    }
+
+    .footer-note {
+      text-align: center;
+      margin-top: 24px;
+      color: #64748b;
+      font-size: 12px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="login-card">
+    <div class="header">
+      <div class="admin-badge">
+        <i class="fa-solid fa-user-shield"></i>
+      </div>
+      <h2>Admin Login</h2>
+      <p>Enter your credentials to access the panel</p>
+    </div>
+
+    <!-- Error Alert Box -->
+    <div class="error-alert" id="errorAlert">
+      <i class="fa-solid fa-triangle-exclamation"></i>
+      <span id="errorMsg">Invalid username or password!</span>
+    </div>
+
+    <!-- Login Form -->
+    <form id="adminLoginForm">
+      <div class="form-group">
+        <label for="username">Username</label>
+        <div class="input-wrapper">
+          <i class="fa-solid fa-user left-icon"></i>
+          <input type="text" id="username" placeholder="Enter username" required autocomplete="off">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="password">Password</label>
+        <div class="input-wrapper">
+          <i class="fa-solid fa-lock left-icon"></i>
+          <input type="password" id="password" placeholder="Enter password" required>
+          <i class="fa-solid fa-eye toggle-password" id="togglePassword"></i>
+        </div>
+      </div>
+
+      <button type="submit" class="submit-btn">
+        <span>Sign In</span>
+        <i class="fa-solid fa-arrow-right"></i>
+      </button>
+    </form>
+
+    <div class="divider">
+      <span>OR</span>
+    </div>
+
+    <!-- Google Login Button -->
+    <button class="google-btn" onclick="handleGoogleLogin()">
+      <svg viewBox="0 0 24 24">
+        <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+        <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+        <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+      </svg>
+      <span>Sign in with Google</span>
+    </button>
+
+    <div class="footer-note">
+      <p>Protected Admin Environment &copy; 2026</p>
+    </div>
+  </div>
+
+  <script>
+    // Password Visibility Toggle Logic
+    const togglePassword = document.getElementById('togglePassword');
+    const passwordInput = document.getElementById('password');
+
+    togglePassword.addEventListener('click', function () {
+      const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+      passwordInput.setAttribute('type', type);
+      this.classList.toggle('fa-eye');
+      this.classList.toggle('fa-eye-slash');
+    });
+
+    // Form Submission Logic
+    const loginForm = document.getElementById('adminLoginForm');
+    const errorAlert = document.getElementById('errorAlert');
+
+    loginForm.addEventListener('submit', function (e) {
+      e.preventDefault();
+
+      const usernameVal = document.getElementById('username').value.trim();
+      const passwordVal = document.getElementById('password').value.trim();
+
+      // Check credentials (Username: mohai, Password: 1234)
+      if (usernameVal === 'mohai' && passwordVal === '1234') {
+        errorAlert.style.display = 'none';
+        // Redirect to admin dashboard
+        window.location.href = 'admin-dashboard.html';
+      } else {
+        errorAlert.style.display = 'flex';
+      }
+    });
+
+    // Google Sign-In Handler
+    function handleGoogleLogin() {
+      // Backend OAuth connection behavior setup location
+      alert('Google Authentication flow initiated. Connect your OAuth API keys here.');
+    }
+  </script>
+</body>
+</html>

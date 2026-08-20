@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Beneficiary Registration - WCC Platform</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="register.css">
+</head>
+<body>
+
+    <div class="register-container">
+        <div class="register-header">
+            <a href="index.html" class="logo">
+                <img src="wcc.png" alt="WCC Logo" class="logo-img">
+            </a>
+            <span class="role-badge beneficiary-badge"><i class="fa-solid fa-hands-holding"></i> Beneficiary Account</span>
+            <h2>Apply for Support</h2>
+            <p>Register your details to request assistance</p>
+        </div>
+
+        <form id="beneficiary-form" novalidate>
+            <!-- Full Name -->
+            <div class="form-group">
+                <label for="fullName">Full Name</label>
+                <div class="input-wrapper">
+                    <i class="fa-regular fa-user input-icon"></i>
+                    <input type="text" id="fullName" placeholder="Enter your full name" required>
+                </div>
+            </div>
+
+            <!-- Phone Number -->
+            <div class="form-group">
+                <label for="phone">Phone Number</label>
+                <div class="input-wrapper">
+                    <i class="fa-solid fa-phone input-icon"></i>
+                    <input type="tel" id="phone" placeholder="017XXXXXXXX" required>
+                </div>
+            </div>
+
+            <!-- National ID / Birth Certificate -->
+            <div class="form-group">
+                <label for="nid">NID or Birth Registration No</label>
+                <div class="input-wrapper">
+                    <i class="fa-solid fa-id-card input-icon"></i>
+                    <input type="text" id="nid" placeholder="Enter NID or Birth Certificate No" required>
+                </div>
+            </div>
+
+            <!-- Required Assistance Type -->
+            <div class="form-group">
+                <label for="assistanceType">Type of Assistance Needed</label>
+                <div class="input-wrapper">
+                    <i class="fa-solid fa-handshake-angle input-icon"></i>
+                    <select id="assistanceType" required>
+                        <option value="" disabled selected>Select help category</option>
+                        <option value="financial">Financial Emergency</option>
+                        <option value="medical">Medical & Healthcare</option>
+                        <option value="education">Educational Support / Scholarship</option>
+                        <option value="food-ration">Food & Monthly Ration</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Address -->
+            <div class="form-group">
+                <label for="address">Present Address / District</label>
+                <div class="input-wrapper">
+                    <i class="fa-solid fa-location-dot input-icon"></i>
+                    <input type="text" id="address" placeholder="Area, District" required>
+                </div>
+            </div>
+
+            <!-- Password -->
+            <div class="form-group">
+                <label for="password">Password</label>
+                <div class="input-wrapper">
+                    <i class="fa-solid fa-lock input-icon"></i>
+                    <input type="password" id="password" placeholder="Minimum 6 characters" required>
+                </div>
+            </div>
+
+            <!-- Confirm Password -->
+            <div class="form-group">
+                <label for="confirmPassword">Confirm Password</label>
+                <div class="input-wrapper">
+                    <i class="fa-solid fa-shield-halved input-icon"></i>
+                    <input type="password" id="confirmPassword" placeholder="Repeat password" required>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary">
+                Register as Beneficiary
+            </button>
+        </form>
+
+        <div class="register-footer">
+            <p>Already have an account? <a href="login.html">Sign In</a></p>
+        </div>
+    </div>
+
+    <script type="module" src="register.js"></script>
+</body>
+</html>

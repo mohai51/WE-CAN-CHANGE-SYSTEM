@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Forgot Password - WCC Platform</title>
+    <!-- Google Fonts: Poppins & Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="forgotpass.css">
+</head>
+<body>
+
+    <div class="forgot-container">
+        <!-- Back Button -->
+        <a href="login.html" class="back-link">
+            <i class="fa-solid fa-arrow-left"></i> Back to Login
+        </a>
+
+        <!-- Form View -->
+        <div id="request-view">
+            <div class="forgot-header">
+                <div class="icon-circle">
+                    <i class="fa-solid fa-key"></i>
+                </div>
+                <h2>Forgot Password?</h2>
+                <p>No worries! Enter your registered email address below and we'll send you a password reset link.</p>
+            </div>
+
+            <form id="forgot-form" novalidate>
+                <!-- Email Input -->
+                <div class="form-group">
+                    <label for="email">Email Address</label>
+                    <div class="input-wrapper">
+                        <i class="fa-regular fa-envelope input-icon"></i>
+                        <input type="email" id="email" placeholder="name@example.com" required>
+                    </div>
+                    <small class="error-msg" id="email-error"></small>
+                </div>
+
+                <!-- Submit Button -->
+                <button type="submit" class="btn btn-primary" id="reset-btn">
+                    <span id="btn-text">Send Reset Link</span>
+                </button>
+            </form>
+        </div>
+
+        <!-- Success Confirmation View (Hidden by Default) -->
+        <div id="success-view" class="hidden">
+            <div class="forgot-header">
+                <div class="icon-circle success-icon">
+                    <i class="fa-regular fa-paper-plane"></i>
+                </div>
+                <h2>Check Your Email</h2>
+                <p>We have sent a password reset link to <strong id="sent-email-display">user@example.com</strong>.</p>
+            </div>
+
+            <div class="success-box">
+                <p><i class="fa-solid fa-circle-info"></i> Didn't receive the email? Check your spam folder or try again.</p>
+            </div>
+
+            <button id="resend-btn" class="btn btn-secondary">Resend Email</button>
+        </div>
+
+        <!-- Footer -->
+        <div class="forgot-footer">
+            <p>Remember your password? <a href="login.html">Sign In</a></p>
+        </div>
+    </div>
+
+    <!-- Firebase SDK & Script -->
+    <script type="module" src="forgotpass.js"></script>
+</body>
+</html>

@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - WCC Platform</title>
+    <!-- Google Fonts: Poppins & Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="login.css">
+</head>
+<body>
+
+    <div class="login-container">
+        <!-- Brand Header / Logo -->
+        <div class="login-header">
+            <a href="index.html" class="logo">
+                <img src="wcc.png" alt="WCC Logo" class="logo-img">
+            </a>
+            <h2>Welcome Back</h2>
+            <p>Select your user type to continue</p>
+        </div>
+
+        <!-- 3-Role Selection Tabs (Default: Volunteer) -->
+        <div class="role-selector">
+            <button class="role-btn active" data-role="volunteer">
+                <i class="fa-solid fa-hand-holding-heart"></i>
+                <span>Volunteer</span>
+            </button>
+            <button class="role-btn" data-role="donor">
+                <i class="fa-solid fa-donate"></i>
+                <span>Donor</span>
+            </button>
+            <button class="role-btn" data-role="beneficiary">
+                <i class="fa-solid fa-hands-holding"></i>
+                <span>Beneficiary</span>
+            </button>
+        </div>
+
+        <!-- Google Authentication Button -->
+        <button id="google-login-btn" class="btn btn-google">
+            <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google Logo" class="google-icon">
+            <span id="google-btn-text">Continue as Volunteer with Google</span>
+        </button>
+
+        <div class="divider">
+            <span>OR</span>
+        </div>
+
+        <!-- Standard Login Form -->
+        <form id="login-form" novalidate>
+            <!-- Hidden Input to track selected role -->
+            <input type="hidden" id="selected-role" value="volunteer">
+
+            <!-- Email Input -->
+            <div class="form-group">
+                <label for="email">Email Address</label>
+                <div class="input-wrapper">
+                    <i class="fa-regular fa-envelope input-icon"></i>
+                    <input type="email" id="email" placeholder="name@example.com" required>
+                </div>
+                <small class="error-msg" id="email-error"></small>
+            </div>
+
+            <!-- Password Input -->
+            <div class="form-group">
+                <div class="label-row">
+                    <label for="password">Password</label>
+                    <a href="forgotpass.html" class="forgot-pass">Forgot Password?</a>
+                </div>
+                <div class="input-wrapper">
+                    <i class="fa-solid fa-lock input-icon"></i>
+                    <input type="password" id="password" placeholder="Enter your password" required>
+                    <i class="fa-regular fa-eye toggle-password" id="toggle-password"></i>
+                </div>
+                <small class="error-msg" id="password-error"></small>
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit" class="btn btn-primary" id="submit-btn">
+                <span id="submit-btn-text">Sign In as Volunteer</span>
+            </button>
+        </form>
+
+        <!-- Dynamic Redirect to Selected Role's Registration Page -->
+        <div class="login-footer">
+            <p>Don't have an account? <a href="role-reg.html" id="register-link">Create an Account</a></p>
+        </div>
+    </div>
+
+    <!-- Firebase App & Auth SDKs / Main JS -->
+    <script type="module" src="login.js"></script>
+</body>
+</html>
