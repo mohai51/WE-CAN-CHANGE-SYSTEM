@@ -22,7 +22,7 @@ The existing landing page is kept as-is and is not being rebuilt here.
 ## Setup
 
 1. `npm install`
-2. Copy `.env.example` to `.env` and fill in your MongoDB URI + session secret
+2.  Create `.env` and fill in with MongoDB URI + session secret
 3. `npm run dev` (or `npm start`)
 4. App runs on `http://localhost:3000`
 
