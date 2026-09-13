@@ -6,5 +6,14 @@
   <a href="/pillars/sports">Sports</a>
   <a href="/pillars/culture">Culture</a>
   <a href="/pillars/heritage">Heritage</a>
-  <a href="/auth/login">Login</a>
+
+  <% if (typeof currentUser !== 'undefined' && currentUser) { %>
+    <% if (currentUser.role === 'admin' || currentUser.role === 'coordinator') { %>
+      <a href="/admin/dashboard">Dashboard</a>
+    <% } %>
+    <span class="badge badge-info"><%= currentUser.name %> · <%= currentUser.role %></span>
+    <a href="/auth/logout">Logout</a>
+  <% } else { %>
+    <a href="/auth/login">Login</a>
+  <% } %>
 </nav>

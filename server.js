@@ -25,6 +25,14 @@ app.use(session({
   saveUninitialized: false
 }));
 
+// make current logged-in user available to every EJS view
+app.use((req, res, next) => {
+  res.locals.currentUser = req.session.userId
+    ? { name: req.session.name, role: req.session.role }
+    : null;
+  next();
+});
+
 app.use('/', publicRoutes);
 app.use('/auth', authRoutes);
 app.use('/admin', adminRoutes);

@@ -1,0 +1,27 @@
+:root {
+  /* Colors */
+  --primary: #B12929;
+  --primary-hover: #8E1E1E;
+  --accent-navy: #24397A;
+
+  --bg-main: #0F172A;
+  --bg-card: rgba(30, 41, 59, 0.75);
+  --bg-card-solid: #1E293B;
+  --bg-input: rgba(15, 23, 42, 0.6);
+
+  --text-main: #F8FAFC;
+  --text-muted: #94A3B8;
+  --border-color: #334155;
+
+  /* Status */
+  --status-success: #10B981;
+  --status-warning: #F59E0B;
+  --status-danger: #EF4444;
+  --status-info: #3B82F6;
+
+  /* Layout Standards */
+  --radius-card: 16px;
+  --radius-btn: 10px;
+  --radius-badge: 20px;
+  --font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
