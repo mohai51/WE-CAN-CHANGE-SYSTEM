@@ -1,0 +1,151 @@
+/**
+ * WCC Finance Management & Accounting System
+ * Theme Variables & Design Tokens
+ * Official Palette:
+ * Deep Crimson Red (#B62A35), Golden Yellow (#F1AD1A), Deep Navy Blue (#1D3557), Green (#169053)
+ */
+
+:root {
+  /* Brand Core Colors */
+  --primary: #B62A35;
+  --primary-hover: #9E1F2A;
+  --primary-light: #BE464F;
+  --primary-subtle: #FDF2F3;
+  --primary-rgb: 182, 42, 53;
+
+  --accent: #F1AD1A;
+  --accent-hover: #D9980F;
+  --accent-light: #FDEBC2;
+  --accent-subtle: #FEF8EC;
+  --accent-rgb: 241, 173, 26;
+
+  --navy: #1D3557;
+  --navy-hover: #15263F;
+  --navy-light: #457B9D;
+  --navy-subtle: #EDF3F8;
+  --navy-rgb: 29, 53, 87;
+
+  --gold-dark: #A6772A;
+
+  /* Functional / Status Colors */
+  --success: #169053;
+  --success-hover: #127443;
+  --success-light: #D1F0E0;
+  --success-subtle: #F0FAF4;
+  --success-rgb: 22, 144, 83;
+
+  --warning: #E08A00;
+  --warning-hover: #B87100;
+  --warning-light: #FDE8C7;
+  --warning-subtle: #FFF9F0;
+
+  --danger: #D92D20;
+  --danger-hover: #B42318;
+  --danger-light: #FEE4E2;
+  --danger-subtle: #FEF3F2;
+
+  --info: #026AA2;
+  --info-hover: #005585;
+  --info-light: #E0F2FE;
+  --info-subtle: #F0F9FF;
+
+  /* Neutral Light Theme */
+  --bg-page: #F7F8FA;
+  --bg-surface: #FFFFFF;
+  --bg-surface-secondary: #F8F9FB;
+  --bg-surface-tertiary: #F1F3F7;
+  
+  --border-color: #E4E7EC;
+  --border-light: #F2F4F7;
+  --border-focus: #B62A35;
+  
+  --text-primary: #191D24;
+  --text-secondary: #475467;
+  --text-tertiary: #667085;
+  --text-quaternary: #98A2B3;
+  --text-inverse: #FFFFFF;
+
+  /* Sidebar Tokens */
+  --sidebar-bg: #FFFFFF;
+  --sidebar-border: #EAECF0;
+  --sidebar-text: #344054;
+  --sidebar-text-active: #B62A35;
+  --sidebar-bg-active: #FDF2F3;
+  --sidebar-bg-hover: #F8F9FA;
+  --sidebar-width: 260px;
+  --sidebar-width-collapsed: 76px;
+
+  /* Header Tokens */
+  --header-height: 68px;
+  --header-bg: #FFFFFF;
+  --header-border: #EAECF0;
+
+  /* Typography */
+  --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  --font-mono: 'JetBrains Mono', 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+  
+  /* Shadows & Elevation */
+  --shadow-xs: 0px 1px 2px rgba(16, 24, 40, 0.05);
+  --shadow-sm: 0px 1px 3px rgba(16, 24, 40, 0.1), 0px 1px 2px rgba(16, 24, 40, 0.06);
+  --shadow-md: 0px 4px 8px -2px rgba(16, 24, 40, 0.1), 0px 2px 4px -2px rgba(16, 24, 40, 0.06);
+  --shadow-lg: 0px 12px 16px -4px rgba(16, 24, 40, 0.08), 0px 4px 6px -2px rgba(16, 24, 40, 0.03);
+  --shadow-xl: 0px 20px 24px -4px rgba(16, 24, 40, 0.08), 0px 8px 8px -4px rgba(16, 24, 40, 0.03);
+
+  /* Radius */
+  --radius-xs: 4px;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 20px;
+  --radius-pill: 9999px;
+
+  /* Transitions */
+  --transition-fast: 0.15s ease-in-out;
+  --transition-normal: 0.25s ease-in-out;
+  --transition-slow: 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* Z-Indices */
+  --z-sticky: 100;
+  --z-header: 200;
+  --z-sidebar: 300;
+  --z-drawer: 400;
+  --z-modal: 100000;
+  --z-toast: 110000;
+  --z-tooltip: 120000;
+}
+
+/* Dark Theme Variables */
+[data-theme="dark"] {
+  --primary-subtle: #2C181B;
+  --accent-subtle: #2B210B;
+  --navy-subtle: #122138;
+  --success-subtle: #0E2519;
+
+  --bg-page: #0E1015;
+  --bg-surface: #171A21;
+  --bg-surface-secondary: #1F232D;
+  --bg-surface-tertiary: #282C39;
+  
+  --border-color: #2D3340;
+  --border-light: #232732;
+  
+  --text-primary: #F2F4F7;
+  --text-secondary: #D0D5DD;
+  --text-tertiary: #98A2B3;
+  --text-quaternary: #667085;
+
+  --sidebar-bg: #13161C;
+  --sidebar-border: #232732;
+  --sidebar-text: #D0D5DD;
+  --sidebar-text-active: #FF707E;
+  --sidebar-bg-active: #2C181B;
+  --sidebar-bg-hover: #1D212B;
+
+  --header-bg: #13161C;
+  --header-border: #232732;
+
+  --shadow-xs: 0px 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-sm: 0px 1px 3px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0px 4px 8px rgba(0, 0, 0, 0.5);
+  --shadow-lg: 0px 12px 16px rgba(0, 0, 0, 0.6);
+}

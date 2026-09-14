@@ -1,0 +1,29 @@
+<%- include('../../partials/header') %>
+<%- include('../../partials/navbar') %>
+<div style="padding: 32px; max-width: 480px;">
+  <h1><%= pillar ? 'Edit Pillar' : 'Add Pillar' %></h1>
+
+  <div class="card" style="margin-top:20px;">
+    <% if (typeof error !== 'undefined' && error) { %>
+      <div class="alert alert-danger"><%= error %></div>
+    <% } %>
+
+    <form method="POST" action="<%= pillar ? '/admin/pillars/' + pillar._id + '?_method=PUT' : '/admin/pillars' %>">
+      <div class="form-group">
+        <label for="name">Name</label>
+        <select class="form-input" id="name" name="name" required>
+          <option value="">-- Select --</option>
+          <% ['Education','Health','Sports','Culture','Heritage'].forEach(n => { %>
+            <option value="<%= n %>" <%= pillar && pillar.name === n ? 'selected' : '' %>><%= n %></option>
+          <% }) %>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="description">Description</label>
+        <textarea class="form-input" id="description" name="description" rows="4"><%= pillar ? pillar.description : '' %></textarea>
+      </div>
+      <button class="btn btn-primary" type="submit"><%= pillar ? 'Update' : 'Create' %></button>
+    </form>
+  </div>
+</div>
+<%- include('../../partials/footer') %>

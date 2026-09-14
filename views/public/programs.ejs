@@ -1,0 +1,19 @@
+<%- include('../partials/header') %>
+<%- include('../partials/navbar') %>
+<div style="padding: 32px;">
+  <h1>Programs & Events</h1>
+  <div style="display:flex; flex-direction:column; gap:16px; margin-top:24px;">
+    <% programs.forEach(p => { %>
+      <div class="card">
+        <h3><%= p.title %> <span class="badge <%= p.type === 'event' ? 'badge-pending' : 'badge-success' %>"><%= p.type %></span></h3>
+        <small style="color: var(--text-muted);"><%= p.pillar ? p.pillar.name : '' %></small>
+        <p style="color: var(--text-muted);"><%= p.description %></p>
+        <small style="color: var(--text-muted);"><%= p.date ? p.date.toDateString() : '' %> <%= p.location ? '· ' + p.location : '' %></small>
+      </div>
+    <% }) %>
+    <% if (programs.length === 0) { %>
+      <p style="color: var(--text-muted);">No programs/events yet.</p>
+    <% } %>
+  </div>
+</div>
+<%- include('../partials/footer') %>

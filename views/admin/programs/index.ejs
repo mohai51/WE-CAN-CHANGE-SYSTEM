@@ -1,0 +1,42 @@
+<%- include('../../partials/header') %>
+<%- include('../../partials/navbar') %>
+<div style="padding: 32px;">
+  <div style="display:flex; justify-content:space-between; align-items:center;">
+    <h1>Programs / Events</h1>
+    <a class="btn btn-primary" style="width:auto;" href="/admin/programs/new">+ Add Program/Event</a>
+  </div>
+
+  <div class="card" style="margin-top:20px; padding:0; overflow:hidden;">
+    <table style="width:100%; border-collapse: collapse;">
+      <thead>
+        <tr style="border-bottom: 1px solid var(--border-color);">
+          <th style="text-align:left; padding:14px 20px; color: var(--text-muted); font-size:13px;">Title</th>
+          <th style="text-align:left; padding:14px 20px; color: var(--text-muted); font-size:13px;">Pillar</th>
+          <th style="text-align:left; padding:14px 20px; color: var(--text-muted); font-size:13px;">Type</th>
+          <th style="text-align:left; padding:14px 20px; color: var(--text-muted); font-size:13px;">Date</th>
+          <th style="text-align:right; padding:14px 20px; color: var(--text-muted); font-size:13px;">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% programs.forEach(p => { %>
+        <tr style="border-bottom: 1px solid var(--border-color);">
+          <td style="padding:14px 20px;"><%= p.title %></td>
+          <td style="padding:14px 20px;"><span class="badge badge-info"><%= p.pillar ? p.pillar.name : '-' %></span></td>
+          <td style="padding:14px 20px; color: var(--text-muted);"><%= p.type %></td>
+          <td style="padding:14px 20px; color: var(--text-muted);"><%= p.date ? p.date.toDateString() : '-' %></td>
+          <td style="padding:14px 20px; text-align:right;">
+            <a class="btn btn-secondary" style="width:auto; padding:6px 12px; display:inline-flex;" href="/admin/programs/<%= p._id %>/edit">Edit</a>
+            <form action="/admin/programs/<%= p._id %>?_method=DELETE" method="POST" style="display:inline;">
+              <button class="btn btn-secondary" style="width:auto; padding:6px 12px; color:#FCA5A5;" onclick="return confirm('Delete this program?')">Delete</button>
+            </form>
+          </td>
+        </tr>
+        <% }) %>
+        <% if (programs.length === 0) { %>
+        <tr><td colspan="5" style="padding:20px; color: var(--text-muted); text-align:center;">No programs/events yet.</td></tr>
+        <% } %>
+      </tbody>
+    </table>
+  </div>
+</div>
+<%- include('../../partials/footer') %>

@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WCC Central Executive Hub - We Can Change</title>
+  <link rel="icon" type="image/png" href="/membership/assets/logo/WCC_logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #0B0F19;
+      --card-bg: #141C2E;
+      --card-hover: #19233A;
+      --border-color: rgba(255, 255, 255, 0.08);
+      --text-main: #F8FAFC;
+      --text-muted: #94A3B8;
+      --wcc-gold: #F1AD1A;
+      --wcc-crimson: #E63946;
+      --wcc-blue: #1D3557;
+      --wcc-green: #2ECC71;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    }
+
+    body {
+      background: radial-gradient(circle at 50% 0%, #17243B 0%, var(--bg-dark) 70%);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Top Navbar */
+    .topbar {
+      background: rgba(14, 21, 35, 0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border-color);
+      padding: 0.9rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+      text-decoration: none;
+    }
+
+    .brand img {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      box-shadow: 0 0 12px rgba(241, 173, 26, 0.3);
+    }
+
+    .brand-title {
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: #FFF;
+      letter-spacing: -0.01em;
+    }
+
+    .brand-badge {
+      font-size: 0.72rem;
+      background: rgba(241, 173, 26, 0.15);
+      border: 1px solid rgba(241, 173, 26, 0.3);
+      color: var(--wcc-gold);
+      padding: 2px 8px;
+      border-radius: 20px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .user-section {
+      display: flex;
+      align-items: center;
+      gap: 1.25rem;
+    }
+
+    .user-pill {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .user-avatar {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: #25334D;
+      border: 2px solid var(--wcc-gold);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 0.85rem;
+      color: var(--wcc-gold);
+    }
+
+    .user-details {
+      line-height: 1.2;
+    }
+
+    .user-name {
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: #FFF;
+    }
+
+    .user-role-badge {
+      font-size: 0.72rem;
+      color: var(--wcc-gold);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .btn-logout {
+      background: rgba(230, 57, 70, 0.12);
+      border: 1px solid rgba(230, 57, 70, 0.3);
+      color: #FF8A8A;
+      padding: 0.5rem 0.9rem;
+      border-radius: 8px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .btn-logout:hover {
+      background: rgba(230, 57, 70, 0.25);
+      color: #FFF;
+    }
+
+    /* Main Content */
+    .hub-container {
+      max-width: 1200px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 2.5rem 1.5rem;
+      flex: 1;
+    }
+
+    .hero-banner {
+      margin-bottom: 2.5rem;
+      text-align: center;
+    }
+
+    .hero-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: rgba(46, 204, 113, 0.12);
+      border: 1px solid rgba(46, 204, 113, 0.3);
+      color: var(--wcc-green);
+      padding: 4px 12px;
+      border-radius: 30px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      margin-bottom: 0.75rem;
+    }
+
+    .hero-title {
+      font-size: 2.2rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: #FFF;
+      margin-bottom: 0.5rem;
+    }
+
+    .hero-subtitle {
+      font-size: 1rem;
+      color: var(--text-muted);
+      max-width: 650px;
+      margin: 0 auto;
+      line-height: 1.5;
+    }
+
+    /* System Cards Grid */
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+      gap: 1.75rem;
+      margin-bottom: 2.5rem;
+    }
+
+    .system-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 18px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.35);
+      transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+      position: relative;
+    }
+
+    .system-card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(241, 173, 26, 0.4);
+      box-shadow: 0 20px 45px rgba(0, 0, 0, 0.5);
+    }
+
+    .system-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, var(--wcc-gold), #FF5E62);
+    }
+
+    .system-card.finance-card::before {
+      background: linear-gradient(90deg, #38EF7D, #11998E);
+    }
+
+    .card-header {
+      padding: 1.75rem 1.75rem 1rem;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+    }
+
+    .card-icon-box {
+      width: 54px;
+      height: 54px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.6rem;
+      background: rgba(241, 173, 26, 0.12);
+      border: 1px solid rgba(241, 173, 26, 0.25);
+    }
+
+    .finance-card .card-icon-box {
+      background: rgba(46, 204, 113, 0.12);
+      border-color: rgba(46, 204, 113, 0.25);
+    }
+
+    .status-badge {
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      padding: 4px 10px;
+      border-radius: 20px;
+      letter-spacing: 0.04em;
+    }
+
+    .badge-membership {
+      background: rgba(241, 173, 26, 0.15);
+      color: var(--wcc-gold);
+      border: 1px solid rgba(241, 173, 26, 0.3);
+    }
+
+    .badge-finance {
+      background: rgba(46, 204, 113, 0.15);
+      color: var(--wcc-green);
+      border: 1px solid rgba(46, 204, 113, 0.3);
+    }
+
+    .card-body {
+      padding: 0 1.75rem 1.75rem;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .card-title {
+      font-size: 1.35rem;
+      font-weight: 800;
+      color: #FFF;
+      margin-bottom: 0.5rem;
+    }
+
+    .card-desc {
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+      margin-bottom: 1.5rem;
+      flex: 1;
+    }
+
+    .shortcuts-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .shortcut-pill {
+      font-size: 0.78rem;
+      padding: 4px 10px;
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border-color);
+      color: var(--text-muted);
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+
+    .shortcut-pill:hover {
+      background: rgba(255, 255, 255, 0.09);
+      color: #FFF;
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    .btn-launch {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 0.85rem;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 0.95rem;
+      text-decoration: none;
+      transition: all 0.2s;
+      border: none;
+    }
+
+    .btn-launch-gold {
+      background: linear-gradient(135deg, var(--wcc-gold), #D4920E);
+      color: #0F1218;
+      box-shadow: 0 4px 15px rgba(241, 173, 26, 0.25);
+    }
+
+    .btn-launch-gold:hover {
+      box-shadow: 0 6px 20px rgba(241, 173, 26, 0.4);
+    }
+
+    .btn-launch-green {
+      background: linear-gradient(135deg, #2ECC71, #27AE60);
+      color: #0F1218;
+      box-shadow: 0 4px 15px rgba(46, 204, 113, 0.25);
+    }
+
+    .btn-launch-green:hover {
+      box-shadow: 0 6px 20px rgba(46, 204, 113, 0.4);
+    }
+
+    /* Security banner */
+    .security-banner {
+      background: rgba(22, 32, 50, 0.6);
+      border: 1px solid var(--border-color);
+      border-radius: 14px;
+      padding: 1.25rem 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .security-info {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+    }
+
+    .security-icon {
+      font-size: 1.5rem;
+    }
+
+    .security-title {
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: #FFF;
+    }
+
+    .security-desc {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+
+    .role-badge-pill {
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 20px;
+      background: rgba(241, 173, 26, 0.15);
+      border: 1px solid rgba(241, 173, 26, 0.3);
+      color: var(--wcc-gold);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Navigation Bar -->
+  <header class="topbar">
+    <a href="/hub" class="brand">
+      <img src="/membership/assets/logo/WCC_logo.png" alt="WCC Logo" onerror="this.src='/finance/WCC_logo.png'">
+      <span class="brand-title">We Can Change (WCC)</span>
+      <span class="brand-badge">Central Hub</span>
+    </a>
+
+    <div class="user-section">
+      <div class="user-pill">
+        <div class="user-avatar">
+          <%= (currentUser && currentUser.name ? currentUser.name.substring(0,2) : 'AD').toUpperCase() %>
+        </div>
+        <div class="user-details">
+          <div class="user-name"><%= currentUser ? currentUser.name : 'Administrator' %></div>
+          <div class="user-role-badge">🛡️ <%= currentUser ? currentUser.role : 'admin' %></div>
+        </div>
+      </div>
+
+      <a href="/auth/logout" class="btn-logout" title="Sign Out">
+        <span>🚪</span>
+        <span>Logout</span>
+      </a>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="hub-container">
+    <div class="hero-banner">
+      <div class="hero-pill">
+        <span>●</span>
+        <span>Single Unified Authentication &bull; MongoDB Cloud Connected</span>
+      </div>
+      <h1 class="hero-title">Executive Control Center</h1>
+      <p class="hero-subtitle">
+        Welcome back, <%= currentUser ? currentUser.name : 'Administrator' %>. As an authorized executive, you have unrestricted access to manage the organization's member registry and financial accounting ledger.
+      </p>
+    </div>
+
+    <!-- The 2 Subsystems Grid -->
+    <div class="cards-grid">
+      <!-- 1. Membership Management System -->
+      <div class="system-card">
+        <div class="card-header">
+          <div class="card-icon-box">👥</div>
+          <span class="status-badge badge-membership">Full Admin Access</span>
+        </div>
+        <div class="card-body">
+          <h2 class="card-title">Membership Management</h2>
+          <p class="card-desc">
+            Complete member registry, approval workflows, digital membership ID cards with QR code verification, demographic analytics, and official directory administration.
+          </p>
+          <div class="shortcuts-list">
+            <a href="/membership/dashboard.html" class="shortcut-pill">📊 Dashboard</a>
+            <a href="/membership/members.html" class="shortcut-pill">👥 All Members</a>
+            <a href="/membership/members.html?status=active" class="shortcut-pill">🟢 Active Members</a>
+            <a href="/membership/analytics.html" class="shortcut-pill">📈 Analytics</a>
+            <a href="/membership/settings.html" class="shortcut-pill">⚙️ Settings</a>
+          </div>
+          <a href="/membership/dashboard.html" class="btn-launch btn-launch-gold">
+            <span>Launch Member Management</span>
+            <span>&rarr;</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- 2. Finance Management System -->
+      <div class="system-card finance-card">
+        <div class="card-header">
+          <div class="card-icon-box">💰</div>
+          <span class="status-badge badge-finance">Full Admin Access</span>
+        </div>
+        <div class="card-body">
+          <h2 class="card-title">Finance & Accounting</h2>
+          <p class="card-desc">
+            Organizational financial ledger, income tracking, expense classification, activity/event budget allocation, member reimbursements, accounts reconciliation, and audits.
+          </p>
+          <div class="shortcuts-list">
+            <a href="/finance/#transactions" class="shortcut-pill">📋 Transactions</a>
+            <a href="/finance/#income" class="shortcut-pill">💰 Income</a>
+            <a href="/finance/#expenses" class="shortcut-pill">💸 Expenses</a>
+            <a href="/finance/#activities" class="shortcut-pill">🎯 Activities</a>
+            <a href="/finance/#reimbursements" class="shortcut-pill">💳 Reimbursements</a>
+            <a href="/finance/#reports" class="shortcut-pill">📄 Reports</a>
+          </div>
+          <a href="/finance/" class="btn-launch btn-launch-green">
+            <span>Launch Finance System</span>
+            <span>&rarr;</span>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Security & RBAC Status Strip -->
+    <div class="security-banner">
+      <div class="security-info">
+        <span class="security-icon">🛡️</span>
+        <div>
+          <div class="security-title">Strict Role-Based Access Control (RBAC) Enforced</div>
+          <div class="security-desc">
+            Admins have dual access to both systems. General Members are restricted strictly to Member Self-Service and will be denied entry to Finance.
+          </div>
+        </div>
+      </div>
+      <div class="role-badge-pill">
+        Admin: <%= currentUser ? (currentUser.userId || currentUser.email) : 'admin' %>
+      </div>
+    </div>
+  </main>
+
+</body>
+</html>

@@ -1,0 +1,2189 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WCC Finance Management & Accounting System</title>
+  <meta name="description" content="Official Financial Management & Accounting System for We Can Change (WCC)">
+
+  <!-- Security Hardening Headers -->
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https: blob:; connect-src 'self' https://script.google.com https://script.googleusercontent.com https://*.google.com;">
+
+  <!-- Google Fonts: Inter & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+  <!-- Core CSS System -->
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/components.css">
+
+  <!-- Immediate Authentication Gating (Prevents Flash of Unauthenticated Content) -->
+  <script>
+    (function() {
+      try {
+        var session = localStorage.getItem('WCC_AUTH_SESSION');
+        if (session) {
+          var parsed = JSON.parse(session);
+          if (parsed && parsed.user && (!parsed.expiresAt || Date.now() <= parsed.expiresAt)) {
+            document.documentElement.classList.add('is-authenticated');
+            return;
+          }
+        }
+      } catch(e) {}
+      document.documentElement.classList.add('not-authenticated');
+    })();
+  </script>
+  <style>
+    html:not(.is-authenticated) .app-container {
+      display: none !important;
+    }
+    html.not-authenticated #login-screen-wrapper {
+      display: flex !important;
+    }
+    html.is-authenticated #login-screen-wrapper {
+      display: none !important;
+    }
+    html.is-authenticated .app-container {
+      display: flex !important;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app-container" style="display:none;">
+    <!-- Collapsible Sidebar Navigation -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <a href="#" class="brand-logo" onclick="window.UI.navigateTo('dashboard')">
+          <img src="WCC_logo.png" alt="WCC Logo" class="brand-logo-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+          <div class="logo-badge" style="display:none;">WCC</div>
+          <div class="brand-text-container">
+            <span class="brand-title">We Can Change</span>
+            <span class="brand-subtitle">Finance Portal</span>
+          </div>
+        </a>
+      </div>
+
+      <nav class="sidebar-nav">
+        <div class="nav-section-label">Overview</div>
+        <a class="nav-item active" data-view="dashboard">
+          <span class="nav-icon">📊</span>
+          <span>Dashboard</span>
+        </a>
+        <a class="nav-item" data-view="transactions">
+          <span class="nav-icon">📋</span>
+          <span>All Transactions</span>
+        </a>
+        <a class="nav-item" data-view="income">
+          <span class="nav-icon">💰</span>
+          <span>Income / Inflows</span>
+        </a>
+        <a class="nav-item" data-view="expenses">
+          <span class="nav-icon">💸</span>
+          <span>Expenses</span>
+        </a>
+
+        <div class="nav-section-label">Operations</div>
+        <a class="nav-item" data-view="activities">
+          <span class="nav-icon">🎯</span>
+          <span>Activities & Events</span>
+        </a>
+        <a class="nav-item" data-view="reimbursements">
+          <span class="nav-icon">💳</span>
+          <span>Reimbursements</span>
+        </a>
+        <a class="nav-item" data-view="advances">
+          <span class="nav-icon">⚖️</span>
+          <span>Advances & Settlements</span>
+        </a>
+
+        <div class="nav-section-label">Accounting & Assets</div>
+        <a class="nav-item" data-view="accounts">
+          <span class="nav-icon">🏦</span>
+          <span>Bank & Cash Vaults</span>
+        </a>
+        <a class="nav-item" data-view="vendors">
+          <span class="nav-icon">🏢</span>
+          <span>Vendor Directory</span>
+        </a>
+        <a class="nav-item" data-view="reports">
+          <span class="nav-icon">📄</span>
+          <span>Financial Reports</span>
+        </a>
+
+        <div class="nav-section-label">System</div>
+        <a class="nav-item" data-view="users" data-permission="MANAGE_USERS">
+          <span class="nav-icon">👥</span>
+          <span>Users & Roles (Admin)</span>
+        </a>
+        <a class="nav-item" data-view="audit">
+          <span class="nav-icon">🛡️</span>
+          <span>Audit Trail</span>
+        </a>
+        <a class="nav-item" data-view="settings">
+          <span class="nav-icon">⚙️</span>
+          <span>Settings & GAS API</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="user-snippet">
+          <div class="user-avatar" id="user-avatar-badge">AD</div>
+          <div class="user-info">
+            <span class="user-name" id="user-profile-name">System Admin</span>
+            <span class="user-role" id="user-profile-role">Admin</span>
+          </div>
+        </div>
+        <div style="display:flex; align-items:center; gap:4px;">
+          <button class="sidebar-toggle-btn" onclick="window.UI.toggleTheme()" title="Toggle Dark/Light Mode">
+            🌓
+          </button>
+          <button class="sidebar-toggle-btn" onclick="window.auth.logout()" title="Sign Out" style="color:var(--danger);">
+            🚪
+          </button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Mobile Sidebar Backdrop Overlay -->
+    <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
+
+    <!-- Main Content Wrapper -->
+    <div class="main-wrapper">
+      <!-- Top Application Header -->
+      <header class="top-header">
+        <div class="header-left">
+          <button class="mobile-menu-trigger" id="mobile-toggle-btn">☰</button>
+          <div class="header-search">
+            <span class="header-search-icon">🔍</span>
+            <input type="text" id="global-search-input" placeholder="Search transactions, activities, members, vendors...">
+            <span class="header-search-kbd">/</span>
+          </div>
+        </div>
+
+        <div class="header-right">
+          <div id="env-mode-pill" class="env-pill mock" onclick="window.UI.navigateTo('settings')" title="Click to configure Google Apps Script endpoint">
+            <span class="pulse-dot"></span> DEMO MODE
+          </div>
+
+          <button class="btn btn-outline btn-sm btn-sync-cloud" onclick="window.api.syncFromCloud()" title="Sync with Google Sheets" style="font-size:12px; padding: 6px 12px;">
+            🔄 Sync Cloud
+          </button>
+
+          <div style="position:relative;">
+            <button class="btn btn-primary btn-sm" onclick="window.UI.openModal('modal-add-expense')">
+              + Quick Add
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <!-- Dynamic Page Container -->
+      <main class="page-container">
+
+        <!-- VIEW 1: DASHBOARD -->
+        <section id="view-dashboard" class="view-section active-view">
+          <div class="view-header">
+            <div class="view-title-group">
+              <ul class="breadcrumb-list">
+                <li class="breadcrumb-item"><a href="#">WCC</a></li>
+                <li class="breadcrumb-separator">/</li>
+                <li class="breadcrumb-item">Executive Dashboard</li>
+              </ul>
+              <h1 class="view-title">Financial Overview</h1>
+              <p class="view-description">Summary of organizational inflows, expenditures, liquidity, and pending member obligations.</p>
+            </div>
+            <div class="view-header-actions">
+              <button class="btn btn-outline btn-sm" onclick="window.dashboardModule.render()">🔄 Refresh</button>
+              <button class="btn btn-navy btn-sm" onclick="window.UI.openModal('modal-add-income')">+ Record Income</button>
+              <button class="btn btn-primary btn-sm" onclick="window.UI.openModal('modal-add-expense')">+ Record Expense</button>
+            </div>
+          </div>
+
+          <!-- Top KPI Grid -->
+          <div class="kpi-grid">
+            <div class="kpi-card income">
+              <div class="kpi-top">
+                <span class="kpi-label">Total Inflows (Income)</span>
+                <div class="kpi-icon-box income">💰</div>
+              </div>
+              <div class="kpi-value" id="kpi-total-income">৳0</div>
+              <div class="kpi-bottom">
+                <span class="kpi-trend positive">↑ Grants & Donations</span>
+              </div>
+            </div>
+
+            <div class="kpi-card expense">
+              <div class="kpi-top">
+                <span class="kpi-label">Incurred Expenses</span>
+                <div class="kpi-icon-box expense">💸</div>
+              </div>
+              <div class="kpi-value" id="kpi-total-expense">৳0</div>
+              <div class="kpi-bottom">
+                <span class="kpi-trend negative">↓ Operations & Events</span>
+              </div>
+            </div>
+
+            <div class="kpi-card balance">
+              <div class="kpi-top">
+                <span class="kpi-label">Total Current Liquidity</span>
+                <div class="kpi-icon-box balance">🏦</div>
+              </div>
+              <div class="kpi-value" id="kpi-current-balance">৳0</div>
+              <div class="kpi-bottom">
+                <span>Cash Vaults & Bank Accounts</span>
+              </div>
+            </div>
+
+            <div class="kpi-card reimburse">
+              <div class="kpi-top">
+                <span class="kpi-label">Pending Member Claims</span>
+                <div class="kpi-icon-box reimburse">💳</div>
+              </div>
+              <div class="kpi-value" id="kpi-pending-reimbursements">৳0</div>
+              <div class="kpi-bottom">
+                <span style="color:var(--gold-dark); font-weight:600;">Personal Out-of-Pocket</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Visual Charts Grid -->
+          <div class="chart-grid-2">
+            <div class="card">
+              <div class="card-header">
+                <h3 class="card-title">Income vs Expense vs Pending Obligations</h3>
+              </div>
+              <div class="card-body">
+                <div class="chart-wrapper">
+                  <canvas id="chart-income-expense"></canvas>
+                </div>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-header">
+                <h3 class="card-title">Expense Allocation by Category</h3>
+              </div>
+              <div class="card-body">
+                <div class="chart-wrapper">
+                  <canvas id="chart-category-expense"></canvas>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Recent Transactions Preview -->
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">Recent Transactions</h3>
+              <button class="btn btn-outline btn-sm" onclick="window.UI.navigateTo('transactions')">View All Ledger &rarr;</button>
+            </div>
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Date</th>
+                    <th>Activity</th>
+                    <th>Category</th>
+                    <th>Amount</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody id="dashboard-recent-txns">
+                  <!-- Populated by JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- VIEW 2: TRANSACTIONS -->
+        <section id="view-transactions" class="view-section">
+          <div class="view-header">
+            <div class="view-title-group">
+              <ul class="breadcrumb-list">
+                <li class="breadcrumb-item"><a href="#">WCC</a></li>
+                <li class="breadcrumb-separator">/</li>
+                <li class="breadcrumb-item">Ledger</li>
+              </ul>
+              <h1 class="view-title">Central Transactions Ledger</h1>
+              <p class="view-description">All incoming and outgoing financial movements across every activity and account.</p>
+            </div>
+            <div class="view-header-actions">
+              <button class="btn btn-navy btn-sm" onclick="window.UI.openModal('modal-add-income')">+ New Income</button>
+              <button class="btn btn-primary btn-sm" onclick="window.UI.openModal('modal-add-expense')">+ New Expense</button>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="filter-bar">
+              <div class="filter-group">
+                <button class="btn btn-subtle btn-sm active" onclick="window.transactionsModule.setFilter('all')">All</button>
+                <button class="btn btn-subtle btn-sm" onclick="window.transactionsModule.setFilter('income')">Income</button>
+                <button class="btn btn-subtle btn-sm" onclick="window.transactionsModule.setFilter('expense')">Expenses</button>
+              </div>
+              <div style="flex:1; max-width:300px;">
+                <input type="text" id="search-transactions" class="form-control form-control-sm" placeholder="🔍 Search transactions or account..." oninput="window.transactionsModule.search(this.value)">
+              </div>
+            </div>
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Transaction ID</th>
+                    <th>Date</th>
+                    <th>Type</th>
+                    <th>Activity & Category</th>
+                    <th>Description</th>
+                    <th>Party / Member</th>
+                    <th>Amount</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody id="transactions-table-body">
+                  <!-- Populated by JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- VIEW 3: EXPENSES -->
+        <section id="view-expenses" class="view-section">
+          <div class="view-header">
+            <div class="view-title-group">
+              <ul class="breadcrumb-list">
+                <li class="breadcrumb-item"><a href="#">WCC</a></li>
+                <li class="breadcrumb-separator">/</li>
+                <li class="breadcrumb-item">Expenditure</li>
+              </ul>
+              <h1 class="view-title">Expense Management</h1>
+              <p class="view-description">Record and track operational, activity, and member out-of-pocket expenses.</p>
+            </div>
+            <div class="view-header-actions">
+              <button class="btn btn-primary btn-sm" onclick="window.UI.openModal('modal-add-expense')">+ Add Expense</button>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Expense ID</th>
+                    <th>Date</th>
+                    <th>Activity & Category</th>
+                    <th>Description</th>
+                    <th>Paid By</th>
+                    <th>Payment Method</th>
+                    <th>Amount</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody id="expenses-table-body">
+                  <!-- Populated by JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- VIEW 4: INCOME -->
+        <section id="view-income" class="view-section">
+          <div class="view-header">
+            <div class="view-title-group">
+              <ul class="breadcrumb-list">
+                <li class="breadcrumb-item"><a href="#">WCC</a></li>
+                <li class="breadcrumb-separator">/</li>
+                <li class="breadcrumb-item">Inflows</li>
+              </ul>
+              <h1 class="view-title">Income & Inflows</h1>
+              <p class="view-description">Record donations, grants, member fees, and sponsorships.</p>
+            </div>
+            <div class="view-header-actions">
+              <button class="btn btn-navy btn-sm" onclick="window.UI.openModal('modal-add-income')">+ Record Income</button>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Income ID</th>
+                    <th>Date</th>
+                    <th>Source / Donor</th>
+                    <th>Activity Link</th>
+                    <th>Account / Channel</th>
+                    <th>Amount</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody id="income-table-body">
+                  <!-- Populated by JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- VIEW 5: ACTIVITIES -->
+        <section id="view-activities" class="view-section">
+          <div class="view-header">
+            <div class="view-title-group">
+              <ul class="breadcrumb-list">
+                <li class="breadcrumb-item"><a href="#">WCC</a></li>
+                <li class="breadcrumb-separator">/</li>
+                <li class="breadcrumb-item">Operations</li>
+              </ul>
+              <h1 class="view-title">Activities, Health Camps & Projects</h1>
+              <p class="view-description">Organized financial containers with budget tracking and one-click financial statements.</p>
+            </div>
+            <div class="view-header-actions">
+              <button class="btn btn-primary btn-sm" onclick="window.UI.openModal('modal-add-activity')">+ Create Activity</button>
+            </div>
+          </div>
+
+          <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(360px, 1fr)); gap:20px;" id="activities-grid">
+            <!-- Populated by JS -->
+          </div>
+        </section>
+
+        <!-- VIEW 6: ACTIVITY FINANCIAL STATEMENT -->
+        <section id="view-activity-statement" class="view-section">
+          <div class="view-header">
+            <div class="view-title-group">
+              <ul class="breadcrumb-list">
+                <li class="breadcrumb-item"><a href="#" onclick="window.UI.navigateTo('activities')">Activities</a></li>
+                <li class="breadcrumb-separator">/</li>
+                <li class="breadcrumb-item">Financial Statement</li>
+              </ul>
+              <h1 class="view-title">Activity Financial Statement</h1>
+            </div>
+            <div class="view-header-actions">
+              <button class="btn btn-outline btn-sm" onclick="window.UI.navigateTo('activities')">&larr; Back to Activities</button>
+            </div>
+          </div>
+
+          <div id="activity-statement-container">
+            <!-- Rendered dynamically -->
+          </div>
+        </section>
+
+        <!-- VIEW 7: REIMBURSEMENTS -->
+        <section id="view-reimbursements" class="view-section">
+          <div class="view-header">
+            <div class="view-title-group">
+              <ul class="breadcrumb-list">
+                <li class="breadcrumb-item"><a href="#">WCC</a></li>
+                <li class="breadcrumb-separator">/</li>
+                <li class="breadcrumb-item">Member Finance</li>
+              </ul>
+              <h1 class="view-title">Member Personal Expense Reimbursements</h1>
+              <p class="view-description">Track and disburse personal money spent by members without double-counting organizational expenses.</p>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Claim ID</th>
+                    <th>Request Date</th>
+                    <th>Member Name</th>
+                    <th>Activity & Category</th>
+                    <th>Description</th>
+                    <th>Claim Amount</th>
+                    <th>Approval Status</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody id="reimbursements-table-body">
+                  <!-- Populated by JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- VIEW 8: ADVANCES & SETTLEMENTS -->
+        <section id="view-advances" class="view-section">
+          <div class="view-header">
+            <div class="view-title-group">
+              <ul class="breadcrumb-list">
+                <li class="breadcrumb-item"><a href="#">WCC</a></li>
+                <li class="breadcrumb-separator">/</li>
+                <li class="breadcrumb-item">Member Finance</li>
+              </ul>
+              <h1 class="view-title">Member Advances & Settlements</h1>
+              <p class="view-description">Reconcile field operational advances against submitted expenses, calculate refunds or additional dues.</p>
+            </div>
+            <div class="view-header-actions">
+              <button class="btn btn-navy btn-sm" onclick="window.UI.openModal('modal-add-advance')">+ Issue Advance</button>
+            </div>
+          </div>
+
+          <div class="card mb-4">
+            <div class="card-header">
+              <h3 class="card-title">Active / Issued Advance Requisitions</h3>
+            </div>
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Advance ID</th>
+                    <th>Date</th>
+                    <th>Member</th>
+                    <th>Activity</th>
+                    <th>Purpose</th>
+                    <th>Advance Amount</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody id="advances-table-body">
+                  <!-- Populated by JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">Completed Settlement Audit Records</h3>
+            </div>
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Settlement ID</th>
+                    <th>Date</th>
+                    <th>Member</th>
+                    <th>Advance Given</th>
+                    <th>Actual Spent</th>
+                    <th>Reconciliation Result</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody id="settlements-table-body">
+                  <!-- Populated by JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- VIEW 9: ACCOUNTS -->
+        <section id="view-accounts" class="view-section">
+          <div class="view-header">
+            <div class="view-title-group">
+              <ul class="breadcrumb-list">
+                <li class="breadcrumb-item"><a href="#">WCC</a></li>
+                <li class="breadcrumb-separator">/</li>
+                <li class="breadcrumb-item">Vaults & Liquidity</li>
+              </ul>
+              <h1 class="view-title">Cash & Bank Accounts</h1>
+              <p class="view-description">Liquidity status across internal petty cash vaults, corporate bank accounts, and bKash/MFS merchant wallets.</p>
+            </div>
+            <div class="view-header-actions">
+              <button class="btn btn-primary btn-sm" onclick="window.accountsModule.openAddModal()">
+                + Add Account / Vault
+              </button>
+            </div>
+          </div>
+
+          <!-- Top Summary Statistics Bar -->
+          <div class="dashboard-stats-grid" id="accounts-summary-bar" style="margin-bottom:24px;">
+            <!-- Populated by accounts.js -->
+          </div>
+
+          <!-- Toolbar: Search & Filter Tabs -->
+          <div class="card" style="margin-bottom:20px; padding:12px 18px;">
+            <div style="display:flex; flex-wrap:wrap; gap:12px; justify-content:space-between; align-items:center;">
+              <!-- Search Box -->
+              <div style="flex:1; min-width:240px; max-width:380px;">
+                <input type="text" class="form-control" placeholder="🔍 Search by name, bank, A/C #..." oninput="window.accountsModule.setSearch(this.value)">
+              </div>
+
+              <!-- Filter Buttons -->
+              <div style="display:flex; flex-wrap:wrap; gap:8px;">
+                <button class="btn btn-primary btn-xs account-filter-btn active" data-filter="all" onclick="window.accountsModule.setFilter('all')">All Accounts</button>
+                <button class="btn btn-outline btn-xs account-filter-btn" data-filter="bank" onclick="window.accountsModule.setFilter('bank')">🏦 Bank Accounts</button>
+                <button class="btn btn-outline btn-xs account-filter-btn" data-filter="mfs" onclick="window.accountsModule.setFilter('mfs')">📱 bKash & MFS</button>
+                <button class="btn btn-outline btn-xs account-filter-btn" data-filter="cash" onclick="window.accountsModule.setFilter('cash')">💵 Cash Vaults</button>
+                <button class="btn btn-outline btn-xs account-filter-btn" data-filter="active" onclick="window.accountsModule.setFilter('active')">✅ Active Only</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Accounts Cards Grid -->
+          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(320px, 1fr)); gap:20px;" id="accounts-grid">
+            <!-- Populated by accounts.js -->
+          </div>
+        </section>
+
+        <!-- VIEW 10: VENDORS -->
+        <section id="view-vendors" class="view-section">
+          <div class="view-header">
+            <div class="view-title-group">
+              <ul class="breadcrumb-list">
+                <li class="breadcrumb-item"><a href="#">WCC</a></li>
+                <li class="breadcrumb-separator">/</li>
+                <li class="breadcrumb-item">Directory</li>
+              </ul>
+              <h1 class="view-title">Vendor & Supplier Ledger</h1>
+              <p class="view-description">Approved pharmaceutical suppliers, printing presses, caterers, and logistics partners.</p>
+            </div>
+            <div class="view-header-actions">
+              <button class="btn btn-primary btn-sm" onclick="window.UI.openModal('modal-add-vendor')">+ Add Vendor</button>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Vendor ID</th>
+                    <th>Company Name</th>
+                    <th>Service Type</th>
+                    <th>Contact Person</th>
+                    <th>Address</th>
+                    <th>Total Spend</th>
+                    <th>Balance Due</th>
+                  </tr>
+                </thead>
+                <tbody id="vendors-table-body">
+                  <!-- Populated by JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- VIEW 11: REPORTS -->
+        <section id="view-reports" class="view-section">
+          <div class="view-header">
+            <div class="view-title-group">
+              <ul class="breadcrumb-list">
+                <li class="breadcrumb-item"><a href="#">WCC</a></li>
+                <li class="breadcrumb-separator">/</li>
+                <li class="breadcrumb-item">Intelligence</li>
+              </ul>
+              <h1 class="view-title">Financial Reports & Exports</h1>
+              <p class="view-description">Generate audit-ready branded PDF statements, CSV ledgers, and activity packages.</p>
+            </div>
+          </div>
+
+          <div class="card" style="max-width:600px;">
+            <div class="card-header">
+              <h3 class="card-title">Activity Statement Generator</h3>
+            </div>
+            <div class="card-body">
+              <div class="form-group">
+                <label class="form-label">Select Activity / Health Camp / Project:</label>
+                <select class="form-select" id="report-activity-select">
+                  <!-- Populated by JS -->
+                </select>
+              </div>
+              <div style="display:flex; gap:12px; margin-top:20px;">
+                <button class="btn btn-primary" onclick="const id = document.getElementById('report-activity-select').value; if(id!=='all') window.reportsModule.exportActivityPDF(id); else window.UI.showToast('Please select a specific activity','warning');">
+                  📥 Download Official PDF
+                </button>
+                <button class="btn btn-outline" onclick="const id = document.getElementById('report-activity-select').value; if(id!=='all') window.reportsModule.exportActivityExcel(id); else window.UI.showToast('Please select a specific activity','warning');">
+                  📊 Export CSV
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- VIEW 12: AUDIT -->
+        <section id="view-audit" class="view-section">
+          <div class="view-header">
+            <div class="view-title-group">
+              <ul class="breadcrumb-list">
+                <li class="breadcrumb-item"><a href="#">WCC</a></li>
+                <li class="breadcrumb-separator">/</li>
+                <li class="breadcrumb-item">Security</li>
+              </ul>
+              <h1 class="view-title">Immutable Audit Trail</h1>
+              <p class="view-description">Chronological log of all financial modifications, reimbursements, and state closures.</p>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Log ID</th>
+                    <th>Timestamp</th>
+                    <th>User & Role</th>
+                    <th>Action</th>
+                    <th>Module</th>
+                    <th>Record ID</th>
+                    <th>Details</th>
+                  </tr>
+                </thead>
+                <tbody id="audit-table-body">
+                  <!-- Populated by JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- VIEW 13: USERS & PERMISSIONS (ADMIN ONLY) -->
+        <section id="view-users" class="view-section" data-permission="MANAGE_USERS">
+          <div class="view-header">
+            <div class="view-title-group">
+              <ul class="breadcrumb-list">
+                <li class="breadcrumb-item"><a href="#">WCC</a></li>
+                <li class="breadcrumb-separator">/</li>
+                <li class="breadcrumb-item">Administration</li>
+              </ul>
+              <h1 class="view-title">User Accounts & Role Permissions</h1>
+              <p class="view-description">Main Admin portal: manage role-based operator accounts, edit credentials, and resolve password reset requests.</p>
+            </div>
+            <div class="view-header-actions">
+              <button class="btn btn-primary btn-sm" onclick="window.UI.openModal('modal-add-user')">+ Add New User</button>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="filter-bar">
+              <div class="filter-group">
+                <button class="btn btn-subtle btn-sm active" id="btn-tab-users" onclick="window.usersModule.setTab('users')">
+                  👥 Active User Logins
+                </button>
+                <button class="btn btn-subtle btn-sm" id="btn-tab-requests" onclick="window.usersModule.setTab('requests')">
+                  🔑 Password Reset Requests <span class="badge badge-pending" id="badge-pending-reset-count" style="display:none; margin-left:4px; font-size:10px;">0</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Tab 1: User Accounts -->
+            <div id="users-tab-content" class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>User ID</th>
+                    <th>User / Name</th>
+                    <th>Email (Login ID)</th>
+                    <th>Role & Access Level</th>
+                    <th>Phone</th>
+                    <th>Status</th>
+                    <th style="text-align:right;">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="users-table-body">
+                  <!-- Populated by js/users.js -->
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Tab 2: Password Reset Requests -->
+            <div id="requests-tab-content" class="table-responsive" style="display:none;">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Request ID</th>
+                    <th>Date Requested</th>
+                    <th>User Name</th>
+                    <th>Registered Email</th>
+                    <th>Contact Phone</th>
+                    <th>Status</th>
+                    <th style="text-align:right;">Admin Action</th>
+                  </tr>
+                </thead>
+                <tbody id="password-requests-table-body">
+                  <!-- Populated by js/users.js -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- VIEW 14: SETTINGS -->
+        <section id="view-settings" class="view-section">
+          <div class="view-header">
+            <div class="view-title-group">
+              <ul class="breadcrumb-list">
+                <li class="breadcrumb-item"><a href="#">WCC</a></li>
+                <li class="breadcrumb-separator">/</li>
+                <li class="breadcrumb-item">Configuration</li>
+              </ul>
+              <h1 class="view-title">System Settings & GAS Backend</h1>
+              <p class="view-description">Configure the Google Apps Script Web App API endpoint, categories, and system defaults.</p>
+            </div>
+          </div>
+
+          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(380px, 1fr)); gap:24px;">
+            <div class="card">
+              <div class="card-header">
+                <h3 class="card-title">Google Apps Script API Endpoint</h3>
+              </div>
+              <div class="card-body">
+                <div style="margin-bottom:14px;">
+                  <span id="settings-mode-status" class="badge badge-verified">Demo Mode</span>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Apps Script Web App URL (Exec Endpoint):</label>
+                  <input type="text" class="form-control" id="settings-gas-url" placeholder="https://script.google.com/macros/s/AKfycb.../exec">
+                  <span class="form-help">Leave empty to run in local Demo Mode. Enter published URL to sync live with Google Sheets & Drive.</span>
+                </div>
+                <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                  <button class="btn btn-primary btn-sm" id="btn-save-gas-url" onclick="window.settingsModule.saveGASUrl()">
+                    Save & Connect
+                  </button>
+                  <button class="btn btn-outline btn-sm btn-sync-cloud" onclick="window.settingsModule.triggerSyncCloud()">
+                    🔄 Sync from Sheets Now
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-header">
+                <h3 class="card-title">Reset & Maintenance</h3>
+              </div>
+              <div class="card-body">
+                <p style="font-size:13px; color:var(--text-secondary); margin-bottom:16px;">
+                  Clear all local transactions, activities, advances, and accounts to start with an empty system.
+                </p>
+                <button class="btn btn-danger btn-sm" onclick="window.settingsModule.resetAllDemoData()">
+                  🗑️ Clear All Transaction Data
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       MODALS
+       ========================================================================= -->
+
+  <!-- MODAL: ADD EXPENSE -->
+  <div class="modal-backdrop" id="modal-add-expense">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 class="modal-title">Record New Expense</h3>
+        <button class="close-btn" onclick="window.UI.closeModal('modal-add-expense')">&times;</button>
+      </div>
+      <form onsubmit="window.expensesModule.handleFormSubmit(event)">
+        <div class="modal-body">
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Expense Date <span class="required">*</span></label>
+              <input type="date" name="date" class="form-control" required value="2026-02-16">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Amount (BDT ৳) <span class="required">*</span></label>
+              <input type="number" name="amount" class="form-control" required min="1" step="any" placeholder="e.g. 3500">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Linked Activity / Health Camp / Project <span class="required">*</span></label>
+            <select name="activityId" class="form-select select-activity-list" required></select>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Expense Category <span class="required">*</span></label>
+              <select name="category" class="form-select select-expense-category-list" required></select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Payment Method</label>
+              <select name="paymentMethod" class="form-select">
+                <option value="Cash">Cash</option>
+                <option value="Bank Transfer">Bank Transfer</option>
+                <option value="bKash">bKash</option>
+                <option value="Nagad">Nagad</option>
+                <option value="Cheque">Cheque</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Critical Personal Expense Switcher -->
+          <div style="background:var(--accent-subtle); border:1px solid var(--accent-light); padding:12px 14px; border-radius:var(--radius-md); margin-bottom:16px;">
+            <label style="display:flex; align-items:center; gap:8px; font-weight:600; font-size:13px; cursor:pointer;">
+              <input type="checkbox" name="isMemberPersonalExpense" id="chk-is-personal-expense">
+              <span>Paid by Member using Personal Money (Pending Reimbursement)</span>
+            </label>
+            <div style="font-size:11.5px; color:var(--text-tertiary); margin-top:4px;">
+              Automatically creates a reimbursement claim for the member without double-counting organizational expense.
+            </div>
+          </div>
+
+          <div class="form-group" id="group-paid-by-member" style="display:none;">
+            <label class="form-label">Person / Member who paid personal money <span class="required">*</span></label>
+            <input type="text" name="paidByMember" id="input-paid-by-member" list="datalist-members" class="form-control" placeholder="Select member suggestion or type any name...">
+            <datalist id="datalist-members"></datalist>
+          </div>
+
+          <div class="form-group" id="group-expense-account">
+            <label class="form-label">Deduct from WCC Account / Vault</label>
+            <select name="accountId" class="form-select select-account-list"></select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Vendor / Supplier / Recipient Name</label>
+            <input type="text" name="vendorOrMember" list="datalist-vendors" class="form-control" placeholder="e.g. Digital Color Press / Square Pharma (select or type)">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Description / Item Details <span class="required">*</span></label>
+            <textarea name="description" class="form-control" required placeholder="Describe items purchased or services rendered..."></textarea>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Invoice / Receipt / Voucher Ref #</label>
+              <input type="text" name="referenceNumber" class="form-control" placeholder="e.g. INV-8849">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Supporting Bill / Voucher (File)</label>
+              <input type="file" class="form-control" accept=".pdf,.jpg,.jpeg,.png">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Internal Remarks</label>
+            <input type="text" name="remarks" class="form-control" placeholder="Optional notes for audit">
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" onclick="window.UI.closeModal('modal-add-expense')">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save Expense</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: ADD INCOME -->
+  <div class="modal-backdrop" id="modal-add-income">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 class="modal-title">Record Incoming Inflow / Donation</h3>
+        <button class="close-btn" onclick="window.UI.closeModal('modal-add-income')">&times;</button>
+      </div>
+      <form onsubmit="window.incomeModule.handleFormSubmit(event)">
+        <div class="modal-body">
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Date Received <span class="required">*</span></label>
+              <input type="date" name="date" class="form-control" required value="2026-02-16">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Amount (BDT ৳) <span class="required">*</span></label>
+              <input type="number" name="amount" class="form-control" required min="1" step="any" placeholder="e.g. 50000">
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Income Type <span class="required">*</span></label>
+              <select name="incomeType" class="form-select" required>
+                <option value="Donation">Donation</option>
+                <option value="Project Grant">Project Grant</option>
+                <option value="Sponsorship">Sponsorship</option>
+                <option value="Membership Fee">Membership Fee</option>
+                <option value="Event Contribution">Event Contribution</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Deposit Account / Vault <span class="required">*</span></label>
+              <select name="accountId" class="form-select select-account-list" required></select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Source / Donor Name <span class="required">*</span></label>
+            <input type="text" name="sourceOrDonor" class="form-control" required placeholder="e.g. Bengal Healthcare CSR Fund / Alumni Donor">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Linked Activity / Project (Optional)</label>
+            <select name="activityId" class="form-select select-activity-list"></select>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Payment Method</label>
+              <select name="paymentMethod" class="form-select">
+                <option value="Bank Transfer">Bank Transfer</option>
+                <option value="bKash">bKash</option>
+                <option value="Nagad">Nagad</option>
+                <option value="Cash">Cash</option>
+                <option value="Cheque">Cheque</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Deposit Reference / Bank TXN #</label>
+              <input type="text" name="referenceNumber" class="form-control" placeholder="e.g. EFT-49102">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Remarks</label>
+            <input type="text" name="remarks" class="form-control" placeholder="Purpose or grant conditions">
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" onclick="window.UI.closeModal('modal-add-income')">Cancel</button>
+          <button type="submit" class="btn btn-navy">Record Income</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: ADD ACTIVITY -->
+  <div class="modal-backdrop" id="modal-add-activity">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 class="modal-title">Create Organizational Activity</h3>
+        <button class="close-btn" onclick="window.UI.closeModal('modal-add-activity')">&times;</button>
+      </div>
+      <form onsubmit="window.activitiesModule.handleFormSubmit(event)">
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label">Activity Name <span class="required">*</span></label>
+            <input type="text" name="name" class="form-control" required placeholder="e.g. WCC Free Health Camp – Sylhet">
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Activity Type <span class="required">*</span></label>
+              <select name="type" class="form-select" required>
+                <option value="Health Camp">Health Camp</option>
+                <option value="Event">Event</option>
+                <option value="Campaign">Campaign</option>
+                <option value="Meeting">Meeting</option>
+                <option value="Training">Training</option>
+                <option value="Office Operation">Office Operation</option>
+                <option value="Project">Project</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Approved Budget (BDT ৳) <span class="required">*</span></label>
+              <input type="number" name="budget" class="form-control" required min="0" placeholder="e.g. 150000">
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Start Date <span class="required">*</span></label>
+              <input type="date" name="startDate" class="form-control" required value="2026-03-01">
+            </div>
+            <div class="form-group">
+              <label class="form-label">End Date</label>
+              <input type="date" name="endDate" class="form-control" value="2026-03-02">
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Location</label>
+              <input type="text" name="location" class="form-control" placeholder="e.g. Jhalakathi / Banani Head Office">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Responsible Lead Person</label>
+              <input type="text" name="responsiblePerson" class="form-control" placeholder="e.g. Dr. Farhana Rahman">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Description & Objectives</label>
+            <textarea name="description" class="form-control" placeholder="Activity scope and beneficiaries..."></textarea>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Internal Notes</label>
+            <input type="text" name="notes" class="form-control">
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" onclick="window.UI.closeModal('modal-add-activity')">Cancel</button>
+          <button type="submit" class="btn btn-primary">Create Activity</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: ADD ADVANCE -->
+  <div class="modal-backdrop" id="modal-add-advance">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 class="modal-title">Issue Field Operational Advance</h3>
+        <button class="close-btn" onclick="window.UI.closeModal('modal-add-advance')">&times;</button>
+      </div>
+      <form onsubmit="window.advancesModule.handleCreateAdvanceSubmit(event)">
+        <div class="modal-body">
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Member <span class="required">*</span></label>
+              <select name="memberId" class="form-select select-member-list" required></select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Advance Amount (BDT ৳) <span class="required">*</span></label>
+              <input type="number" name="advanceAmount" class="form-control" required min="1" placeholder="e.g. 10000">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Linked Activity <span class="required">*</span></label>
+            <select name="activityId" class="form-select select-activity-list" required></select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Purpose of Advance <span class="required">*</span></label>
+            <input type="text" name="purpose" class="form-control" required placeholder="e.g. Food, local transport & venue setup logistics">
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Disbursal Date <span class="required">*</span></label>
+              <input type="date" name="disbursementDate" class="form-control" required value="2026-02-16">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Disburse from Account <span class="required">*</span></label>
+              <select name="accountId" class="form-select select-account-list" required></select>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Payment Channel</label>
+              <select name="paymentMethod" class="form-select">
+                <option value="Cash">Cash</option>
+                <option value="bKash">bKash</option>
+                <option value="Nagad">Nagad</option>
+                <option value="Bank Transfer">Bank Transfer</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Payment Reference #</label>
+              <input type="text" name="paymentReference" class="form-control" placeholder="e.g. CASH-ADV-004">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Notes</label>
+            <input type="text" name="notes" class="form-control">
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" onclick="window.UI.closeModal('modal-add-advance')">Cancel</button>
+          <button type="submit" class="btn btn-navy">Disburse Advance</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: SETTLE ADVANCE -->
+  <div class="modal-backdrop" id="modal-settle-advance">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 class="modal-title">Reconcile & Settle Member Advance</h3>
+        <button class="close-btn" onclick="window.UI.closeModal('modal-settle-advance')">&times;</button>
+      </div>
+      <form onsubmit="window.advancesModule.handleSettleSubmit(event)">
+        <div class="modal-body">
+          <input type="hidden" name="advanceId" id="settle-adv-id">
+          <input type="hidden" id="settle-adv-original-amount">
+
+          <div style="background:var(--bg-surface-secondary); padding:14px; border-radius:var(--radius-md); margin-bottom:16px; font-size:13px;">
+            <div>Member: <strong id="settle-adv-member-display">-</strong></div>
+            <div>Activity: <strong id="settle-adv-activity-display">-</strong></div>
+            <div style="margin-top:4px;">Original Advance Issued: <strong id="settle-adv-amount-display" style="color:var(--navy);">-</strong></div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Actual Total Expense Incurred by Member (৳) <span class="required">*</span></label>
+            <input type="number" name="actualExpense" id="settle-adv-actual-spent" class="form-control" required min="0" step="any" placeholder="e.g. 8500" oninput="window.advancesModule.recalculateVariance()">
+          </div>
+
+          <div id="settle-adv-variance-result" style="padding:10px 14px; border-radius:var(--radius-sm); background:var(--bg-surface-tertiary); margin-bottom:16px; font-size:13.5px;">
+            <!-- Calculated dynamically -->
+          </div>
+
+          <div class="form-group" id="settle-refund-account-group">
+            <label class="form-label">Deposit Unused Refund Back to Account</label>
+            <select name="refundAccountId" class="form-select select-account-list"></select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Settlement Date <span class="required">*</span></label>
+            <input type="date" name="settlementDate" class="form-control" required value="2026-02-16">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Settlement Notes / Audit Details</label>
+            <input type="text" name="notes" class="form-control" placeholder="Vouchers verified, refund deposited.">
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" onclick="window.UI.closeModal('modal-settle-advance')">Cancel</button>
+          <button type="submit" class="btn btn-primary">Complete Settlement</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: PAY REIMBURSEMENT -->
+  <div class="modal-backdrop" id="modal-pay-reimbursement">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 class="modal-title">Disburse Member Reimbursement</h3>
+        <button class="close-btn" onclick="window.UI.closeModal('modal-pay-reimbursement')">&times;</button>
+      </div>
+      <form onsubmit="window.reimbursementsModule.handlePaySubmit(event)">
+        <div class="modal-body">
+          <input type="hidden" name="reimbursementId" id="pay-reim-id">
+
+          <div style="background:var(--accent-subtle); padding:16px; border-radius:var(--radius-md); margin-bottom:16px;">
+            <div style="font-size:13px; color:var(--text-secondary);">Reimbursing Member:</div>
+            <div style="font-size:16px; font-weight:700; color:var(--text-primary);" id="pay-reim-member-name">-</div>
+            <div style="font-size:13px; color:var(--text-tertiary); margin-top:2px;" id="pay-reim-activity-display">-</div>
+            <div style="font-size:22px; font-weight:800; color:var(--gold-dark); margin-top:8px;" id="pay-reim-amount-display">৳0</div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Disburse from Account <span class="required">*</span></label>
+            <select name="accountId" class="form-select select-account-list" required></select>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Payment Channel <span class="required">*</span></label>
+              <select name="paymentMethod" class="form-select" required>
+                <option value="bKash">bKash (MFS)</option>
+                <option value="Nagad">Nagad (MFS)</option>
+                <option value="Bank Transfer">Bank Transfer (BEFTN/NPSB)</option>
+                <option value="Cash">Cash in Hand</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Payment Date <span class="required">*</span></label>
+              <input type="date" name="paymentDate" class="form-control" required value="2026-02-16">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Transaction / Reference #</label>
+            <input type="text" name="paymentReference" class="form-control" placeholder="e.g. BK-REIM-884920">
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" onclick="window.UI.closeModal('modal-pay-reimbursement')">Cancel</button>
+          <button type="submit" class="btn btn-success">Confirm & Disburse</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: CLOSE ACTIVITY WIZARD -->
+  <div class="modal-backdrop" id="modal-close-activity">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 class="modal-title">Close Activity & Lock Records</h3>
+        <button class="close-btn" onclick="window.UI.closeModal('modal-close-activity')">&times;</button>
+      </div>
+      <div class="modal-body" id="modal-close-activity-body">
+        <!-- Rendered by activities.js -->
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline" onclick="window.UI.closeModal('modal-close-activity')">Cancel</button>
+        <button type="button" class="btn btn-primary" id="btn-confirm-close-activity" onclick="window.activitiesModule.executeCloseActivity()">
+          Lock & Close Activity
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: ADD VENDOR -->
+  <div class="modal-backdrop" id="modal-add-vendor">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 class="modal-title">Register New Vendor / Supplier</h3>
+        <button class="close-btn" onclick="window.UI.closeModal('modal-add-vendor')">&times;</button>
+      </div>
+      <form onsubmit="window.vendorsModule.handleFormSubmit(event)">
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label">Vendor / Company Name <span class="required">*</span></label>
+            <input type="text" name="name" class="form-control" required placeholder="e.g. Square Pharmaceuticals Ltd (Distributor)">
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Service / Supply Category <span class="required">*</span></label>
+              <select name="serviceType" class="form-select" required>
+                <option value="Medical Supplies & Drugs">Medical Supplies & Drugs</option>
+                <option value="Printing & Stationery">Printing & Stationery</option>
+                <option value="Food & Refreshment / Catering">Food & Refreshment / Catering</option>
+                <option value="Transportation & Logistics">Transportation & Logistics</option>
+                <option value="Venue & Event Facilities">Venue & Event Facilities</option>
+                <option value="Office Rent & Utilities">Office Rent & Utilities</option>
+                <option value="Equipment & Hardware">Equipment & Hardware</option>
+                <option value="Maintenance & Services">Maintenance & Services</option>
+                <option value="General Supplier">General Supplier</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Contact Person Name</label>
+              <input type="text" name="contactPerson" class="form-control" placeholder="e.g. Md. Alamgir">
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Phone Number</label>
+              <input type="text" name="phone" class="form-control" placeholder="e.g. +880 1711-000000">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Email Address</label>
+              <input type="email" name="email" class="form-control" placeholder="e.g. orders@supplier.com">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Office / Store Address</label>
+            <input type="text" name="address" class="form-control" placeholder="e.g. Kawran Bazar / Banani, Dhaka">
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Opening Due / Balance (৳)</label>
+              <input type="number" name="outstanding" class="form-control" value="0" min="0" step="any">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Internal Notes / Payment Terms</label>
+              <input type="text" name="notes" class="form-control" placeholder="e.g. 15-day credit cycle">
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" onclick="window.UI.closeModal('modal-add-vendor')">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save Vendor</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: ADD ACCOUNT / VAULT -->
+  <div class="modal-backdrop" id="modal-add-account">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 class="modal-title">Add Bank Account, bKash Wallet or Vault</h3>
+        <button class="close-btn" onclick="window.UI.closeModal('modal-add-account')">&times;</button>
+      </div>
+      <form onsubmit="window.accountsModule.handleFormSubmit(event)">
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label">Account / Wallet Display Name <span class="required">*</span></label>
+            <input type="text" name="name" class="form-control" required placeholder="e.g. bKash Merchant #1 (Event Registration) or City Bank Corporate">
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Account Type <span class="required">*</span></label>
+              <select name="accountType" class="form-select" required>
+                <option value="Bank Account">Bank Account (Corporate/Current/Savings)</option>
+                <option value="bKash">bKash (Merchant / Corporate / Personal)</option>
+                <option value="Nagad">Nagad (Merchant / Corporate / Personal)</option>
+                <option value="Rocket">Rocket (Dutch-Bangla Bank MFS)</option>
+                <option value="Cash">Cash in Hand / Petty Cash Vault</option>
+                <option value="Other Wallet">Other MFS / Payment Gateway</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Account # / Wallet MSISDN / Vault Code</label>
+              <input type="text" name="accountNumber" class="form-control" placeholder="e.g. 01700-000000 or 1501200000001">
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Bank / Provider / Institution Name</label>
+              <input type="text" name="bankName" class="form-control" placeholder="e.g. The City Bank PLC / bKash Ltd / BRAC Bank">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Branch Name (For Banks)</label>
+              <input type="text" name="branchName" class="form-control" placeholder="e.g. Gulshan Branch / Principal Branch">
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Routing # / Short Code / Swift</label>
+              <input type="text" name="routingNumber" class="form-control" placeholder="e.g. 225272345 or Merchant Shortcode">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Opening / Initial Balance (BDT ৳)</label>
+              <input type="number" name="openingBalance" class="form-control" min="0" step="any" value="0" placeholder="0">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Account Status <span class="required">*</span></label>
+            <select name="status" class="form-select" required>
+              <option value="Active">Active (Available for Deposits & Payments)</option>
+              <option value="Inactive">Inactive / Suspended</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Purpose / Notes / Description</label>
+            <textarea name="notes" class="form-control" placeholder="e.g. Used for collecting student registrations and online campaign contributions..."></textarea>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" onclick="window.UI.closeModal('modal-add-account')">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save Account</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: EDIT ACCOUNT / VAULT -->
+  <div class="modal-backdrop" id="modal-edit-account">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 class="modal-title">Edit Financial Account Details</h3>
+        <button class="close-btn" onclick="window.UI.closeModal('modal-edit-account')">&times;</button>
+      </div>
+      <form onsubmit="window.accountsModule.handleEditSubmit(event)">
+        <div class="modal-body">
+          <input type="hidden" name="accountId" id="edit-account-id">
+
+          <div class="form-group">
+            <label class="form-label">Account / Wallet Display Name <span class="required">*</span></label>
+            <input type="text" name="name" id="edit-account-name" class="form-control" required>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Account Type <span class="required">*</span></label>
+              <select name="accountType" id="edit-account-type" class="form-select" required>
+                <option value="Bank Account">Bank Account (Corporate/Current/Savings)</option>
+                <option value="bKash">bKash (Merchant / Corporate / Personal)</option>
+                <option value="Nagad">Nagad (Merchant / Corporate / Personal)</option>
+                <option value="Rocket">Rocket (Dutch-Bangla Bank MFS)</option>
+                <option value="Cash">Cash in Hand / Petty Cash Vault</option>
+                <option value="Other Wallet">Other MFS / Payment Gateway</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Account # / Wallet MSISDN / Vault Code</label>
+              <input type="text" name="accountNumber" id="edit-account-number" class="form-control">
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Bank / Provider / Institution Name</label>
+              <input type="text" name="bankName" id="edit-account-bank" class="form-control">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Branch Name</label>
+              <input type="text" name="branchName" id="edit-account-branch" class="form-control">
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Routing # / Short Code</label>
+              <input type="text" name="routingNumber" id="edit-account-routing" class="form-control">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Account Status <span class="required">*</span></label>
+              <select name="status" id="edit-account-status" class="form-select" required>
+                <option value="Active">Active (Available for Deposits & Payments)</option>
+                <option value="Inactive">Inactive / Suspended</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Purpose / Notes / Description</label>
+            <textarea name="notes" id="edit-account-notes" class="form-control"></textarea>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" onclick="window.UI.closeModal('modal-edit-account')">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save Changes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: ADD USER (ADMIN ONLY) -->
+  <div class="modal-backdrop" id="modal-add-user" data-permission="MANAGE_USERS">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 class="modal-title">Create Role-Based User Login</h3>
+        <button class="close-btn" onclick="window.UI.closeModal('modal-add-user')">&times;</button>
+      </div>
+      <form onsubmit="window.usersModule.handleFormSubmit(event)">
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label">Full Name <span class="required">*</span></label>
+            <input type="text" name="name" class="form-control" required placeholder="e.g. Nabila Islam">
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Email (Login ID) <span class="required">*</span></label>
+              <input type="email" name="email" class="form-control" required placeholder="e.g. nabila@wecanchange.org">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Initial Password <span class="required">*</span></label>
+              <input type="password" name="password" class="form-control" required value="wcc123" placeholder="Enter password">
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Assigned Role & Permissions <span class="required">*</span></label>
+              <select name="role" class="form-select" required>
+                <option value="Admin">Admin (Main Admin - Full System Control)</option>
+                <option value="Finance Manager">Finance Manager (Approvals, Disburse & Reports)</option>
+                <option value="Finance Officer">Finance Officer (Verification & Settlements)</option>
+                <option value="Data Entry User">Data Entry User (Incurred Expenses & Inflows)</option>
+                <option value="Viewer">Viewer (Read-Only Financial Statements)</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Phone Number</label>
+              <input type="text" name="phone" class="form-control" placeholder="+880 1711-000000">
+            </div>
+          </div>
+
+          <div style="background:var(--bg-surface-secondary); padding:12px; border-radius:var(--radius-md); font-size:12px; color:var(--text-tertiary);">
+            🔒 <strong>Admin Notice:</strong> The user will be able to log in with this email and password. Their actions will be logged in the immutable Audit Trail.
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" onclick="window.UI.closeModal('modal-add-user')">Cancel</button>
+          <button type="submit" class="btn btn-primary">Create User Login</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: EDIT USER (ADMIN ONLY) -->
+  <div class="modal-backdrop" id="modal-edit-user" data-permission="MANAGE_USERS">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 class="modal-title">Edit User Account & Permissions</h3>
+        <button class="close-btn" onclick="window.UI.closeModal('modal-edit-user')">&times;</button>
+      </div>
+      <form onsubmit="window.usersModule.handleEditSubmit(event)">
+        <div class="modal-body">
+          <input type="hidden" name="userId" id="edit-user-id">
+
+          <div class="form-group">
+            <label class="form-label">Full Name <span class="required">*</span></label>
+            <input type="text" name="name" id="edit-user-name" class="form-control" required>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Email (Login ID) <span class="required">*</span></label>
+              <input type="email" name="email" id="edit-user-email" class="form-control" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Phone Number</label>
+              <input type="text" name="phone" id="edit-user-phone" class="form-control">
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Assigned Role <span class="required">*</span></label>
+              <select name="role" id="edit-user-role" class="form-select" required>
+                <option value="Admin">Admin (Main Admin - Full System Control)</option>
+                <option value="Finance Manager">Finance Manager (Approvals, Disburse & Reports)</option>
+                <option value="Finance Officer">Finance Officer (Verification & Settlements)</option>
+                <option value="Data Entry User">Data Entry User (Incurred Expenses & Inflows)</option>
+                <option value="Viewer">Viewer (Read-Only Financial Statements)</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Account Status <span class="required">*</span></label>
+              <select name="status" id="edit-user-status" class="form-select" required>
+                <option value="Active">Active (Can Login)</option>
+                <option value="Inactive">Inactive (Login Blocked)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group" style="background:var(--bg-surface-secondary); padding:14px; border-radius:var(--radius-md); border:1px solid var(--border-color);">
+            <label class="form-label" style="font-weight:700;">Reset / Change Password (Optional):</label>
+            <input type="password" name="newPassword" id="edit-user-new-password" class="form-control" placeholder="Leave empty to keep current password">
+            <span class="form-help">Enter a new password if the user requested a reset or credentials need updating.</span>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" onclick="window.UI.closeModal('modal-edit-user')">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save Changes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: FORGOT PASSWORD REQUEST (PUBLIC / USER-FACING) -->
+  <div class="modal-backdrop" id="modal-forgot-password">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 class="modal-title">Request Password Reset</h3>
+        <button class="close-btn" onclick="window.UI.closeModal('modal-forgot-password')">&times;</button>
+      </div>
+      <form onsubmit="window.usersModule.handleForgotPasswordSubmit(event)">
+        <div class="modal-body">
+          <p style="font-size:13px; color:var(--text-secondary); margin-bottom:16px;">
+            Enter your registered email address. A password reset request will be submitted to the <strong>Main Admin</strong>, who will verify your account and provide you with a new password.
+          </p>
+
+          <div class="form-group">
+            <label class="form-label">Registered Email Address <span class="required">*</span></label>
+            <input type="email" name="email" class="form-control" required placeholder="your.name@wecanchange.org">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Your Contact Phone / WhatsApp <span class="required">*</span></label>
+            <input type="text" name="phone" class="form-control" required placeholder="+880 1700-000000">
+            <span class="form-help">The Main Admin will reach out to this number/email with your new login credentials.</span>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Additional Note / Reason (Optional)</label>
+            <textarea name="message" class="form-control" placeholder="e.g. Forgot password for field tablet login..."></textarea>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" onclick="window.UI.closeModal('modal-forgot-password')">Cancel</button>
+          <button type="submit" class="btn btn-primary">Submit Request to Admin</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: RESOLVE PASSWORD RESET REQUEST (ADMIN ONLY) -->
+  <div class="modal-backdrop" id="modal-resolve-reset-request" data-permission="MANAGE_USERS">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 class="modal-title">Resolve Password Reset & Set New Password</h3>
+        <button class="close-btn" onclick="window.UI.closeModal('modal-resolve-reset-request')">&times;</button>
+      </div>
+      <form onsubmit="window.usersModule.handleResolveRequestSubmit(event)">
+        <div class="modal-body">
+          <input type="hidden" name="requestId" id="resolve-req-id">
+
+          <div style="background:var(--bg-surface-secondary); padding:14px; border-radius:var(--radius-md); margin-bottom:16px; font-size:13px;">
+            <div>User: <strong id="resolve-req-user-name">-</strong></div>
+            <div>Registered Email: <strong id="resolve-req-user-email">-</strong></div>
+            <div>Contact Phone: <strong id="resolve-req-user-phone">-</strong></div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Assign New Password for User <span class="required">*</span></label>
+            <input type="text" name="newPassword" id="resolve-new-password" class="form-control" required style="font-family:var(--font-mono); font-weight:700; font-size:15px; color:var(--primary);">
+            <span class="form-help">Enter a secure temporary or permanent password. You will need to share this with the user.</span>
+          </div>
+
+          <div style="background:var(--accent-subtle); border:1px solid var(--accent-light); padding:12px; border-radius:var(--radius-md); font-size:12px; color:var(--gold-dark);">
+            ℹ️ <strong>Instructions:</strong> After clicking Confirm, please copy this password and send it to the user via SMS, phone call, or secure email.
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" onclick="window.UI.closeModal('modal-resolve-reset-request')">Cancel</button>
+          <button type="submit" class="btn btn-primary">Confirm & Update Password</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: EDIT EXPENSE -->
+  <div class="modal-backdrop" id="modal-edit-expense">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 class="modal-title">Edit Expense Record</h3>
+        <button class="close-btn" onclick="window.UI.closeModal('modal-edit-expense')">&times;</button>
+      </div>
+      <form onsubmit="window.expensesModule.handleEditSubmit(event)">
+        <div class="modal-body">
+          <input type="hidden" name="expenseId" id="edit-expense-id">
+
+          <div style="background:var(--accent-subtle); padding:10px 14px; border-radius:var(--radius-md); margin-bottom:14px; font-size:12.5px; color:var(--text-secondary);">
+            Editing ID: <strong id="edit-expense-id-display" class="code-pill">-</strong> &bull; Correcting data entry errors
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Expense Date <span class="required">*</span></label>
+              <input type="date" name="date" id="edit-expense-date" class="form-control" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Amount (BDT ৳) <span class="required">*</span></label>
+              <input type="number" name="amount" id="edit-expense-amount" class="form-control" required min="1" step="any">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Linked Activity / Project <span class="required">*</span></label>
+            <select name="activityId" id="edit-expense-activity" class="form-select select-activity-list" required></select>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Expense Category <span class="required">*</span></label>
+              <select name="category" id="edit-expense-category" class="form-select select-expense-category-list" required></select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Payment Method</label>
+              <select name="paymentMethod" id="edit-expense-payment-method" class="form-select">
+                <option value="Cash">Cash</option>
+                <option value="Bank Transfer">Bank Transfer</option>
+                <option value="bKash">bKash</option>
+                <option value="Nagad">Nagad</option>
+                <option value="Cheque">Cheque</option>
+              </select>
+            </div>
+          </div>
+
+          <div style="background:var(--accent-subtle); border:1px solid var(--accent-light); padding:12px 14px; border-radius:var(--radius-md); margin-bottom:16px;">
+            <label style="display:flex; align-items:center; gap:8px; font-weight:600; font-size:13px; cursor:pointer;">
+              <input type="checkbox" name="isMemberPersonalExpense" id="edit-chk-is-personal-expense" onchange="window.expensesModule.toggleEditPersonalExpense(this.checked)">
+              <span>Paid by Member using Personal Money (Pending Reimbursement)</span>
+            </label>
+          </div>
+
+          <div class="form-group" id="edit-group-paid-by-member" style="display:none;">
+            <label class="form-label">Person / Member who paid personal money <span class="required">*</span></label>
+            <input type="text" name="paidByMember" id="edit-input-paid-by-member" list="datalist-members" class="form-control" placeholder="Select member or type name...">
+          </div>
+
+          <div class="form-group" id="edit-group-expense-account">
+            <label class="form-label">Deduct from WCC Account / Vault</label>
+            <select name="accountId" id="edit-expense-account" class="form-select select-account-list"></select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Vendor / Supplier / Recipient Name</label>
+            <input type="text" name="vendorOrMember" id="edit-expense-vendor" list="datalist-vendors" class="form-control">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Description / Item Details <span class="required">*</span></label>
+            <textarea name="description" id="edit-expense-description" class="form-control" required></textarea>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Invoice / Receipt / Voucher Ref #</label>
+              <input type="text" name="referenceNumber" id="edit-expense-reference" class="form-control">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Internal Remarks</label>
+              <input type="text" name="remarks" id="edit-expense-remarks" class="form-control">
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" onclick="window.UI.closeModal('modal-edit-expense')">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save Changes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: EDIT INCOME -->
+  <div class="modal-backdrop" id="modal-edit-income">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 class="modal-title">Edit Income Record</h3>
+        <button class="close-btn" onclick="window.UI.closeModal('modal-edit-income')">&times;</button>
+      </div>
+      <form onsubmit="window.incomeModule.handleEditSubmit(event)">
+        <div class="modal-body">
+          <input type="hidden" name="incomeId" id="edit-income-id">
+
+          <div style="background:var(--accent-subtle); padding:10px 14px; border-radius:var(--radius-md); margin-bottom:14px; font-size:12.5px; color:var(--text-secondary);">
+            Editing ID: <strong id="edit-income-id-display" class="code-pill">-</strong> &bull; Correcting data entry errors
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Date Received <span class="required">*</span></label>
+              <input type="date" name="date" id="edit-income-date" class="form-control" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Amount (BDT ৳) <span class="required">*</span></label>
+              <input type="number" name="amount" id="edit-income-amount" class="form-control" required min="1" step="any">
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Income Type <span class="required">*</span></label>
+              <select name="incomeType" id="edit-income-type" class="form-select" required>
+                <option value="Donation">Donation</option>
+                <option value="Project Grant">Project Grant</option>
+                <option value="Sponsorship">Sponsorship</option>
+                <option value="Membership Fee">Membership Fee</option>
+                <option value="Event Contribution">Event Contribution</option>
+                <option value="Fundraising">Fundraising</option>
+                <option value="Service Income">Service Income</option>
+                <option value="Other Income">Other Income</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Deposit Account / Vault <span class="required">*</span></label>
+              <select name="accountId" id="edit-income-account" class="form-select select-account-list" required></select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Source / Donor Name <span class="required">*</span></label>
+            <input type="text" name="sourceOrDonor" id="edit-income-source" class="form-control" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Linked Activity / Project (Optional)</label>
+            <select name="activityId" id="edit-income-activity" class="form-select select-activity-list"></select>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Payment Method</label>
+              <select name="paymentMethod" id="edit-income-payment-method" class="form-select">
+                <option value="Bank Transfer">Bank Transfer</option>
+                <option value="bKash">bKash</option>
+                <option value="Nagad">Nagad</option>
+                <option value="Cash">Cash</option>
+                <option value="Cheque">Cheque</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Deposit Reference / Bank TXN #</label>
+              <input type="text" name="referenceNumber" id="edit-income-reference" class="form-control">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Remarks</label>
+            <input type="text" name="remarks" id="edit-income-remarks" class="form-control">
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" onclick="window.UI.closeModal('modal-edit-income')">Cancel</button>
+          <button type="submit" class="btn btn-navy">Save Changes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: EDIT ADVANCE -->
+  <div class="modal-backdrop" id="modal-edit-advance">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 class="modal-title">Edit Operational Advance</h3>
+        <button class="close-btn" onclick="window.UI.closeModal('modal-edit-advance')">&times;</button>
+      </div>
+      <form onsubmit="window.advancesModule.handleEditSubmit(event)">
+        <div class="modal-body">
+          <input type="hidden" name="advanceId" id="edit-adv-id">
+
+          <div style="background:var(--accent-subtle); padding:10px 14px; border-radius:var(--radius-md); margin-bottom:14px; font-size:12.5px; color:var(--text-secondary);">
+            Editing Advance: <strong id="edit-adv-id-display" class="code-pill">-</strong>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Member <span class="required">*</span></label>
+              <select name="memberId" id="edit-adv-member" class="form-select select-member-list" required></select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Advance Amount (BDT ৳) <span class="required">*</span></label>
+              <input type="number" name="advanceAmount" id="edit-adv-amount" class="form-control" required min="1">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Linked Activity <span class="required">*</span></label>
+            <select name="activityId" id="edit-adv-activity" class="form-select select-activity-list" required></select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Purpose of Advance <span class="required">*</span></label>
+            <input type="text" name="purpose" id="edit-adv-purpose" class="form-control" required>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Disbursal Date <span class="required">*</span></label>
+              <input type="date" name="disbursementDate" id="edit-adv-date" class="form-control" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Disburse from Account <span class="required">*</span></label>
+              <select name="accountId" id="edit-adv-account" class="form-select select-account-list" required></select>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Payment Channel</label>
+              <select name="paymentMethod" id="edit-adv-payment-method" class="form-select">
+                <option value="Cash">Cash</option>
+                <option value="bKash">bKash</option>
+                <option value="Nagad">Nagad</option>
+                <option value="Bank Transfer">Bank Transfer</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Payment Reference #</label>
+              <input type="text" name="paymentReference" id="edit-adv-reference" class="form-control">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Notes</label>
+            <input type="text" name="notes" id="edit-adv-notes" class="form-control">
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" onclick="window.UI.closeModal('modal-edit-advance')">Cancel</button>
+          <button type="submit" class="btn btn-navy">Save Changes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: EDIT ACTIVITY -->
+  <div class="modal-backdrop" id="modal-edit-activity">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 class="modal-title">Edit Activity / Project</h3>
+        <button class="close-btn" onclick="window.UI.closeModal('modal-edit-activity')">&times;</button>
+      </div>
+      <form onsubmit="window.activitiesModule.handleEditSubmit(event)">
+        <div class="modal-body">
+          <input type="hidden" name="activityId" id="edit-act-id">
+
+          <div style="background:var(--accent-subtle); padding:10px 14px; border-radius:var(--radius-md); margin-bottom:14px; font-size:12.5px; color:var(--text-secondary);">
+            Editing Activity: <strong id="edit-act-id-display" class="code-pill">-</strong>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Activity Name <span class="required">*</span></label>
+            <input type="text" name="name" id="edit-act-name" class="form-control" required>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Activity Type <span class="required">*</span></label>
+              <select name="type" id="edit-act-type" class="form-select" required>
+                <option value="Health Camp">Health Camp</option>
+                <option value="Event">Event</option>
+                <option value="Campaign">Campaign</option>
+                <option value="Meeting">Meeting</option>
+                <option value="Training">Training</option>
+                <option value="Office Operation">Office Operation</option>
+                <option value="Project">Project</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Approved Budget (BDT ৳) <span class="required">*</span></label>
+              <input type="number" name="budget" id="edit-act-budget" class="form-control" required min="0">
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Start Date <span class="required">*</span></label>
+              <input type="date" name="startDate" id="edit-act-start-date" class="form-control" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">End Date</label>
+              <input type="date" name="endDate" id="edit-act-end-date" class="form-control">
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Location</label>
+              <input type="text" name="location" id="edit-act-location" class="form-control">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Responsible Lead Person</label>
+              <input type="text" name="responsiblePerson" id="edit-act-lead" class="form-control">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Description & Objectives</label>
+            <textarea name="description" id="edit-act-description" class="form-control"></textarea>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Internal Notes</label>
+            <input type="text" name="notes" id="edit-act-notes" class="form-control">
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" onclick="window.UI.closeModal('modal-edit-activity')">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save Changes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: EDIT REIMBURSEMENT -->
+  <div class="modal-backdrop" id="modal-edit-reimbursement">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 class="modal-title">Edit Reimbursement Claim</h3>
+        <button class="close-btn" onclick="window.UI.closeModal('modal-edit-reimbursement')">&times;</button>
+      </div>
+      <form onsubmit="window.reimbursementsModule.handleEditSubmit(event)">
+        <div class="modal-body">
+          <input type="hidden" name="reimbursementId" id="edit-reim-id">
+
+          <div style="background:var(--accent-subtle); padding:10px 14px; border-radius:var(--radius-md); margin-bottom:14px; font-size:12.5px; color:var(--text-secondary);">
+            Claim ID: <strong id="edit-reim-id-display" class="code-pill">-</strong> &bull; Member: <strong id="edit-reim-member-display">-</strong>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Claim Amount (BDT ৳) <span class="required">*</span></label>
+            <input type="number" name="amount" id="edit-reim-amount" class="form-control" required min="1" step="any">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Expense Category <span class="required">*</span></label>
+            <select name="category" id="edit-reim-category" class="form-select select-expense-category-list" required></select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Description <span class="required">*</span></label>
+            <textarea name="description" id="edit-reim-description" class="form-control" required></textarea>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Notes</label>
+            <input type="text" name="notes" id="edit-reim-notes" class="form-control">
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" onclick="window.UI.closeModal('modal-edit-reimbursement')">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save Changes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       LOGIN SCREEN OVERLAY (STRICT AUTHENTICATION GATE)
+       ========================================================================= -->
+  <div id="login-screen-wrapper" style="display:flex; position:fixed; inset:0; background:linear-gradient(135deg, var(--bg-page) 0%, #EAEFF6 100%); z-index:9990; align-items:center; justify-content:center; padding:20px;">
+    <div class="card" style="width:100%; max-width:440px; box-shadow:var(--shadow-xl); border-radius:var(--radius-xl); overflow:hidden;">
+      <div style="background:linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 60%, var(--accent) 100%); padding:32px 28px; text-align:center; color:#fff; position:relative;">
+        <img src="WCC_logo.png" alt="WCC Logo" class="login-logo-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="logo-badge" style="display:none; width:52px; height:52px; font-size:20px; margin:0 auto 12px auto; box-shadow:0 4px 12px rgba(0,0,0,0.25);">
+          WCC
+        </div>
+        <h2 style="font-size:20px; font-weight:800; color:#fff; line-height:1.2;">We Can Change (WCC)</h2>
+        <div style="font-size:12px; opacity:0.9; text-transform:uppercase; letter-spacing:0.06em; margin-top:4px;">
+          Finance & Accounting Portal
+        </div>
+      </div>
+
+      <div class="card-body" style="padding:28px;">
+        <form onsubmit="window.app.handleLogin(event)">
+          <div class="form-group">
+            <label class="form-label">Email Address <span class="required">*</span></label>
+            <input type="email" name="email" id="login-input-email" class="form-control" required placeholder="name@wecanchange.org" autocomplete="username">
+          </div>
+
+          <div class="form-group" style="margin-bottom:12px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+              <label class="form-label" style="margin-bottom:0;">Password <span class="required">*</span></label>
+              <button type="button" onclick="window.UI.openModal('modal-forgot-password')" style="background:none; border:none; padding:0; font-size:12px; color:var(--primary); font-weight:600; cursor:pointer; text-decoration:underline;">
+                Forgot Password?
+              </button>
+            </div>
+            <input type="password" name="password" id="login-input-pass" class="form-control" required placeholder="••••••••" autocomplete="current-password">
+          </div>
+
+          <button type="submit" class="btn btn-primary btn-lg" style="width:100%; margin-top:16px;">
+            🔐 Sign In to Dashboard
+          </button>
+        </form>
+
+        <div style="text-align:center; margin-top:20px; font-size:12px; color:var(--text-tertiary);">
+          Protected organizational financial portal &bull; Access restricted to authorized personnel
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Core JavaScript Application Stack -->
+  <script src="js/config.js"></script>
+  <script src="js/mockData.js"></script>
+  <script src="js/state.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/charts.js"></script>
+  <script src="js/transactions.js"></script>
+  <script src="js/expenses.js"></script>
+  <script src="js/income.js"></script>
+  <script src="js/activities.js"></script>
+  <script src="js/reimbursements.js"></script>
+  <script src="js/advances.js"></script>
+  <script src="js/reports.js"></script>
+  <script src="js/vendors.js"></script>
+  <script src="js/users.js"></script>
+  <script src="js/accounts.js"></script>
+  <script src="js/audit.js"></script>
+  <script src="js/settings.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>403 Access Denied - We Can Change (WCC)</title>
+  <link rel="icon" type="image/png" href="/membership/assets/logo/WCC_logo.png">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #0D131F;
+      --card-bg: #162032;
+      --border-color: rgba(255, 255, 255, 0.08);
+      --text-primary: #F8FAFC;
+      --text-secondary: #94A3B8;
+      --wcc-gold: #F1AD1A;
+      --wcc-crimson: #E63946;
+      --wcc-blue: #1D3557;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    }
+
+    body {
+      background: radial-gradient(circle at 50% 20%, #1E293B 0%, var(--bg-dark) 80%);
+      color: var(--text-primary);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+    }
+
+    .error-card {
+      max-width: 520px;
+      width: 100%;
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 2.5rem 2rem;
+      text-align: center;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.45);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .error-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, var(--wcc-crimson), var(--wcc-gold));
+    }
+
+    .badge-icon {
+      width: 72px;
+      height: 72px;
+      background: rgba(230, 57, 70, 0.12);
+      border: 1px solid rgba(230, 57, 70, 0.3);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+      margin: 0 auto 1.5rem;
+    }
+
+    h1 {
+      font-size: 1.75rem;
+      font-weight: 800;
+      color: #FFF;
+      margin-bottom: 0.5rem;
+    }
+
+    .code-badge {
+      display: inline-block;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 4px 10px;
+      border-radius: 20px;
+      background: rgba(230, 57, 70, 0.2);
+      color: #FF7B7B;
+      margin-bottom: 1rem;
+    }
+
+    p {
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+      line-height: 1.6;
+      margin-bottom: 1.5rem;
+    }
+
+    .user-pill {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      font-size: 0.85rem;
+      margin-bottom: 1.75rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .user-pill span.role-tag {
+      background: rgba(46, 204, 113, 0.2);
+      color: #2ECC71;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .actions {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 0.85rem 1.25rem;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 0.95rem;
+      text-decoration: none;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      border: none;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--wcc-gold), #D4920E);
+      color: #0F1218;
+      box-shadow: 0 4px 14px rgba(241, 173, 26, 0.3);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(241, 173, 26, 0.4);
+    }
+
+    .btn-outline {
+      background: transparent;
+      border: 1px solid var(--border-color);
+      color: var(--text-secondary);
+    }
+
+    .btn-outline:hover {
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--text-primary);
+    }
+  </style>
+</head>
+<body>
+  <div class="error-card">
+    <div class="badge-icon">🛡️</div>
+    <div class="code-badge">HTTP 403 &bull; Access Restricted</div>
+    <h1>Administrator Access Required</h1>
+    <p>
+      <%= message || 'You are logged in as a Member. The Finance Management System and Admin Operations are strictly restricted to Executive Administrators.' %>
+    </p>
+
+    <% if (typeof currentUser !== 'undefined' && currentUser) { %>
+      <div class="user-pill">
+        <span>Logged in as: <strong><%= currentUser.name %></strong> (<%= currentUser.userId || currentUser.email %>)</span>
+        <span class="role-tag"><%= currentUser.role %></span>
+      </div>
+    <% } %>
+
+    <div class="actions">
+      <a href="/membership/my-profile.html" class="btn btn-primary">
+        <span>👤 Return to My Member Portal</span>
+      </a>
+      <a href="/auth/login?role=admin" class="btn btn-outline">
+        <span>🛡️ Switch to Administrator Login</span>
+      </a>
+      <a href="/auth/logout" class="btn btn-outline" style="color: #FF7B7B; border-color: rgba(230,57,70,0.3);">
+        <span>🚪 Sign Out</span>
+      </a>
+    </div>
+  </div>
+</body>
+</html>
